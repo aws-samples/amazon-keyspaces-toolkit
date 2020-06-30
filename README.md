@@ -10,8 +10,8 @@ This container extends from [awscli container](https://aws.amazon.com/blogs/deve
 * 3.11.6 Apache Cassandra distribution with CQLSH
 * Amazon Web Services pem file for SSL connectivity
 * CQLSHRC file with best practices
-* Helpers to perform secure login with [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
-* AWS CLI. [See How to use the AWSCLI Container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/)
+* Helpers/examples to perform to common task
+* AWS CLI. Official Documentation [See How to use the AWSCLI Container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/)
 
 ### Architecture
 ![Figure 1-1](content/static/keyspaces-toolkit-architecture.png "Architecture")
@@ -19,10 +19,12 @@ This container extends from [awscli container](https://aws.amazon.com/blogs/deve
 * CQLSHRC file is located at root directory of this project
 * Toolkit scripts located in /bin directory of this project
 * Keyspaces PEM file is downloaded when creating the container
+* Apache Cassandra downloaded as part of container creation
+* Container extends from AWS CLI Container and can be accessed via overriding the [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint) parameter
 
 
 # TLDR;
-The following steps to connect to Amazon Keyspaces using the Toolkit; Clone. Build. Connect. Go!
+The following three steps to connect to Amazon Keyspaces using the Toolkit. Clone. Build Image. Connect to Keyspaces and Go!  
 
 ```sh
   git clone https://github.com/aws-samples/amazon-keyspaces-toolkit .
@@ -36,6 +38,7 @@ The following steps to connect to Amazon Keyspaces using the Toolkit; Clone. Bui
    #Voila! You are now connected.
 
 ```
+
 
 # Table of Contents
 
@@ -91,7 +94,7 @@ To start a container, you will need to build the docker image first. The reposit
 ## Generate Service Specific Credentials
 Service-specific credentials enable IAM users to access a specific AWS service. The credentials cannot be used to access other AWS services. They are associated with a specific IAM user and cannot be used by other IAM users.
 
-* IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
+* See official documentation for IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
 
 ```sh
 aws iam create-service-specific-credential \
