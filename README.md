@@ -27,9 +27,9 @@ The following steps to connect to Amazon Keyspaces using the Toolkit; Clone. Bui
 ```sh
   git clone https://github.com/aws-samples/amazon-keyspaces-toolkit .
 
-  docker build --tag aws/keyspaces-cqlsh .
+  docker build --tag aws/keyspaces-toolkit .
 
-  docker run --rm -ti aws/keyspaces-cqlsh \
+  docker run --rm -ti aws/keyspaces-toolkit \
    cassandra.us-east-1.amazonaws.com 9142 \
    -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
 
@@ -37,18 +37,15 @@ The following steps to connect to Amazon Keyspaces using the Toolkit; Clone. Bui
 
 ```
 
-
 # Table of Contents
 
 - [Prerequisites](#prerequisites)
-  * [Generate Service Specific Credentials](#generate-service-specific-credentials)
-  * [Store Generated User Credentials in Amazon Secrets Manager (Optional)](#store-generated-user-credentials-in-amazon-secrets-manager--optional-)
   * [Setup Docker](#setup-docker)
   * [Build Image From Docker file](#build-image-from-docker-file)
+  * [Generate Service Specific Credentials](#generate-service-specific-credentials)
 - [Run](#run)
   * [Create and Run Container](#create-and-run-container)
   * [Executing statements](#executing-statements)
-  * [Using the AWS CLI from this container](#using-the-aws-cli-from-this-container)
   * [Connect to Apache Cassandra](#connect-to-apache-cassandra)
   * [Copy Data From Apache Cassandra](#copy-data-from-apache-cassandra)
   * [Copy Data To Amazon Keyspaces](#copy-data-to-amazon-keyspaces)
@@ -65,7 +62,33 @@ The following steps to connect to Amazon Keyspaces using the Toolkit; Clone. Bui
 
 # Prerequisites
 
-#### Generate Service Specific Credentials
+## Setup Docker
+
+Containers add a level of platform independence allowing for installation on various operating systems including Linux, Mac, and Windows. Find your operating system below, and follow the installation process. After installing, you will have access to the docker terminal from the command line terminal.
+
+* Windows: [Visit Windows Download and Tutorial](https://docs.docker.com/docker-for-windows/install/)
+* Mac: [Visit Mac Download and Tutorial](https://docs.docker.com/docker-for-mac/install/)
+* Linux: [Visit Linux Download and Tutorial](https://docs.docker.com/engine/install/)
+
+
+## Build Image From Docker file
+
+To start a container, you will need to build the docker image first. The repository is open source and open to customization.  [https://github.com/aws-samples/amazon-keyspaces-toolkit](https://github.com/aws-samples/amazon-keyspaces-toolkit)
+
+`Parameters`
+
+* `--tag`  - is used to give the image a name and version. The tag name provided will be used later when creating the container from the image
+* `.`   -  sets the location of the Dockerfile as the current working directory
+
+```sh
+  git clone https://github.com/aws-samples/amazon-keyspaces-toolkit
+
+  cd amazon-keyspaces-toolkit
+
+  docker build --tag aws/keyspaces-toolkit .
+```
+
+## Generate Service Specific Credentials
 Service-specific credentials enable IAM users to access a specific AWS service. The credentials cannot be used to access other AWS services. They are associated with a specific IAM user and cannot be used by other IAM users.
 
 * IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
@@ -75,6 +98,7 @@ aws iam create-service-specific-credential \
     --user-name alice \
     --service-name cassandra.amazonaws.com
 ```
+
 
 _*Example Output*_
 
@@ -92,42 +116,8 @@ _*Example Output*_
 }
 ```
 
-#### Store Generated User Credentials in Amazon Secrets Manager (Optional)
-AWS Secrets Manager helps you protect secrets needed to access your applications, services, and IT resources. The service enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle. Replace `SERVICEUSERNAME` and `SERVICEPASSWORD` with the generated values. The `--name` parameter signifies the key used to access credentials in later examples _**keyspaces-credentials**_
-
-```sh
-aws secretsmanager create-secret --name keyspaces-credentials \
---description "Store Amazon Keyspaces Generated Service Credentials" \
---secret-string "{\"username\":\"SERVICEUSERNAME\", \"password\":\"SERVICEPASSWORD\"}"
-```
 
 
-## Setup Docker
-
-Containers add a level of platform independence allowing for installation on various operating systems including Linux, Mac, and Windows. Find your operating system below, and follow the installation process. After installing, you will have access to the docker terminal from the command line terminal.
-
-* Windows: [Visit Windows Download and Tutorial](https://docs.docker.com/docker-for-windows/install/)
-* Mac: [Visit Mac Download and Tutorial](https://docs.docker.com/docker-for-mac/install/)
-* Linux: [Visit Linux Download and Tutorial](https://docs.docker.com/engine/install/)
-
-
-
-## Build Image From Docker file
-
-To start a container, you will need to build the docker image first. The repository is open source and open to customization.  [https://github.com/aws-samples/amazon-keyspaces-toolkit](https://github.com/aws-samples/amazon-keyspaces-toolkit)
-
-`Parameters`
-
-* `--tag`  - is used to give the image a name and version. The tag name provided will be used later when creating the container from the image
-* `.`   -  sets the location of the Dockerfile as the current working directory
-
-```sh
-  git clone https://github.com/aws-samples/amazon-keyspaces-toolkit
-
-  cd amazon-keyspaces-toolkit
-
-  docker build --tag aws/keyspaces-cqlsh .
-```
 
 # Run
 The following section will provide examples of CQLSH usage with Apache Cassandra and Amazon Keyspaces.
@@ -142,7 +132,7 @@ After building the image we can then run the container. For more options see Doc
 * `-ti`  - interactive bash shell in the container
 
 ```sh
-docker run --rm -ti aws/keyspaces-cqlsh \
+docker run --rm -ti aws/keyspaces-toolkit \
  cassandra.us-east-1.amazonaws.com 9142 \
  -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
 ```
@@ -154,7 +144,7 @@ _*Replace SERVICEUSERNAME and SERVICEPASSWORD with [Generated service-specific c
 We can also use this container to execute commands using the --execute parameter. For a list of CQLSH commands see the following resource: [List of CQLSH commands](https://cassandra.apache.org/doc/latest/tools/cqlsh.html). This will allow you to embed this functionality in existing scripts.
 
   ```sh
-  docker run --rm -ti aws/keyspaces-cqlsh \
+  docker run --rm -ti aws/keyspaces-toolkit \
   cassandra.us-east-1.amazonaws.com 9142 \
   -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
   --execute "CREATE KEYSPACE \"aws\" WITH
@@ -172,7 +162,7 @@ We can also use this container to execute commands using the --execute parameter
     docker run --rm -ti \
       -v ~/.aws:/root/.aws \
       -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
-      aws/keyspaces-cqlsh \
+      aws/keyspaces-toolkit \
       SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
        --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
        --execute "DESCRIBE TABLE aws.workshop"
@@ -192,7 +182,7 @@ We can also use this container to execute commands using the --execute parameter
     -v ~/.aws:/root/.aws \
     -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
     -v ~/datadump:/root/datadump \
-    aws/keyspaces-cqlsh \
+    aws/keyspaces-toolkit \
     SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
      --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
      --execute "CONSISTENCY LOCAL_ONE;
@@ -228,7 +218,7 @@ We can also use this container to execute commands using the --execute parameter
     -v ~/.aws:/root/.aws \
     -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
     -v ~/datadump:/root/datadump \
-    aws/keyspaces-cqlsh \
+    aws/keyspaces-toolkit \
     cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
      --execute "CONSISTENCY LOCAL_QUORUM;
            COPY aws.workshop (id,time,event)
@@ -243,7 +233,17 @@ In this section we will describe usage for the helpers found in the /bin directo
 ## AWS Secrets Manager Wrapper
 When using [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) it is common practice to store the username and password in [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/). This allows you to use the AWS CLI to retrieve the credentials and not expose the credentials in plain text. The following script will use the AWS CLI config profile to grab stored service credentials from AWS Secrets Manager.
 
-_*Requires AWS CLI to be installed and configured on local host or setup within container*_
+#### Store Generated User Credentials in Amazon Secrets Manager
+AWS Secrets Manager helps you protect secrets needed to access your applications, services, and IT resources. The service enables you to easily rotate, manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle. Replace `SERVICEUSERNAME` and `SERVICEPASSWORD` with the generated values. The `--name` parameter signifies the key used to access credentials in later examples _**keyspaces-credentials**_
+
+```sh
+aws secretsmanager create-secret --name keyspaces-credentials \
+--description "Store Amazon Keyspaces Generated Service Credentials" \
+--secret-string "{\"username\":\"SERVICEUSERNAME\", \"password\":\"SERVICEPASSWORD\"}"
+```
+
+#### Execute Secrets Manager Wrapper Entrypoint
+The container provides a script `aws-sm-cqlsh.sh` which will call out to the secrets manager and append the user and password to your CQLSH statement. It requires AWS CLI to be installed and configured on host or setup within container. `-v` parameter is used in the example below to locate the awscli configuration on the host instance.
 
 `Parameters`
 
@@ -261,7 +261,7 @@ _*Example: open cqlsh shell*_
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh \
- aws/keyspaces-cqlsh keyspaces-credentials \
+ aws/keyspaces-toolkit keyspaces-credentials \
  cassandra.us-east-1.amazonaws.com 9142 --ssl
 ```
 _*Example: execute statement*_
@@ -269,7 +269,7 @@ _*Example: execute statement*_
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh  \
- aws/keyspaces-cqlsh keyspaces-credentials \
+ aws/keyspaces-toolkit keyspaces-credentials \
  cassandra.us-east-1.amazonaws.com 9142 --ssl \
  --execute "CREATE TABLE aws.workshop(
 	id text,
@@ -292,7 +292,7 @@ Keyspace and table creation are Asynchronous in Amazon Keyspaces. This asynchron
 #!/bin/bash
 
 #create a table
-docker run -ti --name createtablec aws/keyspaces-cqlsh \
+docker run -ti --name createtablec aws/keyspaces-toolkit \
 cassandra.us-east-1.amazonaws.com 9142 \
 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
 --execute "CREATE TABLE aws.workshop_backofftest(
@@ -302,14 +302,17 @@ cassandra.us-east-1.amazonaws.com 9142 \
  PRIMARY KEY(id, time))
  WITH CUSTOM_PROPERTIES = {'capacity_mode':{'throughput_mode':'PAY_PER_REQUEST'}}"
 
-# Check the error code of container. Make sure to drop the --rm statement from the previous run command. You can always rm after.
+# Check the error code of container.
+# Make sure to drop the --rm statement from the previous run command.
 docker inspect createtablec --format='{{.State.ExitCode}}'
 
+#ok to remove
 docker rm createtablec
 
 #exponential backoff describe
-docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh aws/keyspaces-cqlsh \
- 10 360 \
+#run for 30 seconds or 120 attempts which ever comes first
+docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh aws/keyspaces-toolkit \
+ 30 120 \
  cassandra.us-east-1.amazonaws.com 9142 \
  --ssl -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" \
  --execute "DESCRIBE TABLE aws.workshop_backofftest"
@@ -321,13 +324,14 @@ docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh aws/keyspaces-cqlsh \
 ```text
 --- Docker ---
 #Logs
-$> docker logs aws/keyspaces-cqlsh
+$> docker logs CONTAINERID
 
 #Remove Image
-$> docker rmi aws/keyspaces-cqlsh
+$> docker rmi aws/keyspaces-toolkit
 
 #exit code
 docker inspect createtablec --format='{{.State.ExitCode}}'
+
 
 --- CQL ---
 #Describe keyspace
