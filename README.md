@@ -95,6 +95,7 @@ To start a container, you will need to build the docker image first. The reposit
 Service-specific credentials enable IAM users to access a specific AWS service. The credentials cannot be used to access other AWS services. They are associated with a specific IAM user and cannot be used by other IAM users.
 
 * See official documentation for IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
+* You can also use the container by overriding the entrypoint (`--entrypoint aws`). [See the awscli documentation on how to use awscli](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/)
 
 ```sh
 aws iam create-service-specific-credential \
