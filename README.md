@@ -212,7 +212,7 @@ We can also use this container to execute commands using the --execute parameter
 
 #### Load to Amazon Keyspaces
   * `COPY` table to copy from
-  * `FROM` the directory/file to load from. We use the same directory of newly shuffled data 'datadump/shuffled'.
+  * `FROM` the directory/file to load from. We use the directory of newly shuffled data 'datadump/shuffled'.
   * `HEADER` leave header out since we want to explicitly map columns
   * `DELIMITER` choose a different delimiter than ',' since it is used in other types such as maps, lists, and sets
   --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
@@ -220,7 +220,7 @@ We can also use this container to execute commands using the --execute parameter
   docker run --rm -ti \
     -v ~/.aws:/root/.aws \
     -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
-    -v ~/datadump:/root/datadump \
+    -v ~/datadump:/root/datadump/shuffled \
     aws/keyspaces-toolkit \
     cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
      --execute "CONSISTENCY LOCAL_QUORUM;
