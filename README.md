@@ -199,7 +199,7 @@ We can also use this container to execute commands using the --execute parameter
 
 
   #### Shuffle Data for even distribution
-  From the blog we learned that exporting existing data from Cassandra will result in an ordered dataset. Before loading the data to Amazon Keyspaces, it’s recommended to shuffle the data in the CSV to improve the import performance by distributing the load across data partitions. The following script will shuffle the lines in all files within a directory starting with 'export.csv'.
+  From the blog we learned that exporting existing data from Cassandra will result in an ordered dataset. Before loading the data to Amazon Keyspaces, it’s recommended to shuffle the data in the CSV to improve the import distribution across data partitions. The following script will shuffle the lines in all files within a directory starting with 'export.csv'.
 
   ```sh
   #!/bin/bash
