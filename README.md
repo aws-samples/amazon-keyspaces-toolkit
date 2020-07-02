@@ -1,6 +1,6 @@
 # CQLSH Docker container optimized for Amazon Keyspaces (for Apache Cassandra)
 
-This repository provides docker container for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. The container includes configuration settings optimized for Amazon Keyspaces, but will also work with Self-Managed Apache Cassandra clusters.
+This repository provides docker container for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. The container includes configuration settings optimized for Amazon Keyspaces, but will also work with Apache Cassandra clusters.
 
 ## Amazon Keyspaces (for Apache Cassandra)
 [Amazon Keyspaces](https://aws.amazon.com/keyspaces/) is a scalable, highly available, and managed Apache Cassandra–compatible database service. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic.
