@@ -1,12 +1,12 @@
 # CQLSH Docker container optimized for Amazon Keyspaces (for Apache Cassandra)
 
-A docker container for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. This container includes configuration settings optimized for Amazon Keyspaces, but it will also work with Self-Managed Apache Cassandra clusters.
+This repository provides docker container for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. The container includes configuration settings optimized for Amazon Keyspaces, but will also work with Self-Managed Apache Cassandra clusters.
 
 ## Amazon Keyspaces (for Apache Cassandra)
-[Amazon Keyspaces (for Apache Cassandra)] (https://aws.amazon.com/keyspaces/) is a scalable, highly available, and managed Apache Cassandra–compatible database service. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic.
+[Amazon Keyspaces(for Apache Cassandra)] (https://aws.amazon.com/keyspaces/) is a scalable, highly available, and managed Apache Cassandra–compatible database service. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic.
 
 ## What's included
-This container extends from [awscli container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/) and includes the following Cassandra components.
+This container extends from [awscli container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/) and includes the following Cassandra components:
 * 3.11.6 Apache Cassandra distribution with CQLSH
 * Amazon Web Services pem file for SSL connectivity
 * CQLSHRC file with best practices
@@ -147,22 +147,21 @@ _*Replace SERVICEUSERNAME and SERVICEPASSWORD with [Generated service-specific c
 
 We can also use this container to execute commands using the --execute parameter. For a list of CQLSH commands see the following resource: [List of CQLSH commands](https://cassandra.apache.org/doc/latest/tools/cqlsh.html). This will allow you to embed this functionality in existing scripts.
 
-  ```sh
+```sh
   docker run --rm -ti aws/keyspaces-toolkit \
   cassandra.us-east-1.amazonaws.com 9142 \
   -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
-  --execute "CREATE KEYSPACE \"aws\" WITH
-	REPLICATION = {'class': 'SingleRegionStrategy'}"
-  ```
+  --execute "CREATE KEYSPACE \"aws\" WITH REPLICATION = {'class': 'SingleRegionStrategy'}"
+```
 
 ## Connect to Apache Cassandra
-    To connection to Apache Cassandra override the parameters or provide location of a different cqlshrc file. The following shows how to mount a local directory to docker and configure the container to use a cqlshrc file to configure the connection to an Apache Cassandra cluster.
+To connect to Apache Cassandra override the parameters or provide location of a different cqlshrc file. The following shows how to mount a local directory to docker and configure the container to use a cqlshrc file to configure the connection to an Apache Cassandra cluster.
 
-    To Change SSL Options you can
-    * Override paramters in the command line
-    * Override CQLSHRC location with the `--cqlshrc` paramter
+To Change SSL Options you can:
+* Override paramters in the command line
+* Override CQLSHRC location with the `--cqlshrc` paramter
 
-    ```sh
+```sh
     docker run --rm -ti \
       -v ~/.aws:/root/.aws \
       -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
@@ -170,7 +169,7 @@ We can also use this container to execute commands using the --execute parameter
       SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
        --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
        --execute "DESCRIBE TABLE aws.workshop"
-    ```
+```
 
 ## Copy Data From Apache Cassandra
   You can export data from Cassandra clusters by using the CQLSH COPY command. You can export the data to a mounted directory. In this example we use a folder called datadump on the localhost to store the export.
@@ -247,7 +246,7 @@ aws secretsmanager create-secret --name keyspaces-credentials \
 ```
 
 #### Execute Secrets Manager Wrapper Entrypoint
-The container provides a script `aws-sm-cqlsh.sh` which will call out to the secrets manager and append the user and password to your CQLSH statement. It requires AWS CLI to be installed and configured on host or setup within container. `-v` parameter is used in the example below to locate the awscli configuration on the host instance.
+The container provides a script `aws-sm-cqlsh.sh` which will call out to the secrets manager and append the user and password to your CQLSH statement. It requires AWS CLI to be installed and configured on host or setup within container. The `-v` parameter is used in the example below to locate the awscli configuration on the host instance.
 
 `Parameters`
 
