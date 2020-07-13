@@ -1,6 +1,6 @@
 # CQLSH Docker container optimized for Amazon Keyspaces (for Apache Cassandra)
 
-A docker container for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. This container includes configuration settings optimized for Amazon Keyspaces, but it will also work with Self-Managed Apache Cassandra clusters.
+A docker image for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. This container includes configuration settings optimized for Amazon Keyspaces, but it will also work with Self-Managed Apache Cassandra clusters.
 
 ## Amazon Keyspaces (for Apache Cassandra)
 [Amazon Keyspaces (for Apache Cassandra)] (https://aws.amazon.com/keyspaces/) is a scalable, highly available, and managed Apache Cassandra–compatible database service. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic.
@@ -29,9 +29,9 @@ The following three steps to connect to Amazon Keyspaces using the Toolkit. Clon
 ```sh
   git clone https://github.com/aws-samples/amazon-keyspaces-toolkit .
 
-  docker build --tag aws/keyspaces-toolkit .
+  docker build --tag amazon/keyspaces-toolkit .
 
-  docker run --rm -ti aws/keyspaces-toolkit \
+  docker run --rm -ti amazon/keyspaces-toolkit \
    cassandra.us-east-1.amazonaws.com 9142 \
    -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
 
@@ -88,7 +88,7 @@ To start a container, you will need to build the docker image first. The reposit
 
   cd amazon-keyspaces-toolkit
 
-  docker build --tag aws/keyspaces-toolkit .
+  docker build --tag amazon/keyspaces-toolkit .
 ```
 
 ## Generate Service Specific Credentials
@@ -135,7 +135,7 @@ After building the image we can then run the container. For more options see Doc
 * `-ti`  - interactive bash shell in the container
 
 ```sh
-docker run --rm -ti aws/keyspaces-toolkit \
+docker run --rm -ti amazon/keyspaces-toolkit \
  cassandra.us-east-1.amazonaws.com 9142 \
  -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
 ```
@@ -147,7 +147,7 @@ _*Replace SERVICEUSERNAME and SERVICEPASSWORD with [Generated service-specific c
 We can also use this container to execute commands using the --execute parameter. For a list of CQLSH commands see the following resource: [List of CQLSH commands](https://cassandra.apache.org/doc/latest/tools/cqlsh.html). This will allow you to embed this functionality in existing scripts.
 
   ```sh
-  docker run --rm -ti aws/keyspaces-toolkit \
+  docker run --rm -ti amazon/keyspaces-toolkit \
   cassandra.us-east-1.amazonaws.com 9142 \
   -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
   --execute "CREATE KEYSPACE \"aws\" WITH
@@ -165,7 +165,7 @@ We can also use this container to execute commands using the --execute parameter
     docker run --rm -ti \
       -v ~/.aws:/root/.aws \
       -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
-      aws/keyspaces-toolkit \
+      amazon/keyspaces-toolkit \
       SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
        --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
        --execute "DESCRIBE TABLE aws.workshop"
@@ -185,7 +185,7 @@ We can also use this container to execute commands using the --execute parameter
     -v ~/.aws:/root/.aws \
     -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
     -v ~/datadump:/root/datadump \
-    aws/keyspaces-toolkit \
+    amazon/keyspaces-toolkit \
     SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
      --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
      --execute "CONSISTENCY LOCAL_ONE;
@@ -221,7 +221,7 @@ We can also use this container to execute commands using the --execute parameter
     -v ~/.aws:/root/.aws \
     -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
     -v ~/datadump:/root/datadump \
-    aws/keyspaces-toolkit \
+    amazon/keyspaces-toolkit \
     cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
      --execute "CONSISTENCY LOCAL_QUORUM;
            COPY aws.workshop (id,time,event)
@@ -264,7 +264,7 @@ _*Example: open cqlsh shell*_
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh \
- aws/keyspaces-toolkit keyspaces-credentials \
+ amazon/keyspaces-toolkit keyspaces-credentials \
  cassandra.us-east-1.amazonaws.com 9142 --ssl
 ```
 _*Example: execute statement*_
@@ -272,7 +272,7 @@ _*Example: execute statement*_
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh  \
- aws/keyspaces-toolkit keyspaces-credentials \
+ amazon/keyspaces-toolkit keyspaces-credentials \
  cassandra.us-east-1.amazonaws.com 9142 --ssl \
  --execute "CREATE TABLE aws.workshop(
 	id text,
@@ -295,7 +295,7 @@ Keyspace and table creation are Asynchronous in Amazon Keyspaces. This asynchron
 #!/bin/bash
 
 #create a table
-docker run -ti --name createtablec aws/keyspaces-toolkit \
+docker run -ti --name createtablec amazon/keyspaces-toolkit \
 cassandra.us-east-1.amazonaws.com 9142 \
 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
 --execute "CREATE TABLE aws.workshop_backofftest(
@@ -314,7 +314,7 @@ docker rm createtablec
 
 #exponential backoff describe
 #run for 30 seconds or 120 attempts which ever comes first
-docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh aws/keyspaces-toolkit \
+docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh amazon/keyspaces-toolkit \
  30 120 \
  cassandra.us-east-1.amazonaws.com 9142 \
  --ssl -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" \
@@ -330,7 +330,7 @@ docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh aws/keyspaces-toolkit
 $> docker logs CONTAINERID
 
 #Remove Image
-$> docker rmi aws/keyspaces-toolkit
+$> docker rmi amazon/keyspaces-toolkit
 
 #exit code
 docker inspect createtablec --format='{{.State.ExitCode}}'
