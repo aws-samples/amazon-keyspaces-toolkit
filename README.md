@@ -28,6 +28,7 @@ The following three steps to connect to Amazon Keyspaces using the Toolkit. Clon
 
 ```sh
   git clone https://github.com/aws-samples/amazon-keyspaces-toolkit .
+  git submodule update --init --recursive
 
   docker build --tag amazon/keyspaces-toolkit .
 
