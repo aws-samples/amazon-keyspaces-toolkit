@@ -1,13 +1,15 @@
-# CQLSH Docker container optimized for Amazon Keyspaces (for Apache Cassandra)
+#  Amazon Keyspaces (for Apache Cassandra) developer toolkit
 
-This repository provides docker image for Cassandra Query Language Shell (CQLSH) to help you use CQLSH with Amazon Keyspaces for functional testing, light operations, and data migration. The container includes configuration settings optimized for Amazon Keyspaces, but will also work with Apache Cassandra clusters.
+This repository provides a Docker image for common tooling for Amazon Keyspaces. Keyspaces for functional testing, light operations, and data migration.
+
+The toolkit is optimized for Amazon Keyspaces, but will also work with Apache Cassandra clusters.
 
 ## Amazon Keyspaces (for Apache Cassandra)
 [Amazon Keyspaces](https://aws.amazon.com/keyspaces/) is a scalable, highly available, and managed Apache Cassandra–compatible database service. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic.
 
 ## What's included
 This container extends from [awscli container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/) and includes the following Cassandra components:
-* 3.11.6 Apache Cassandra distribution with CQLSH
+* 3.11.6 Apache Cassandra distribution of CQLSH
 * Amazon Web Services pem file for SSL connectivity
 * CQLSHRC file with best practices
 * Helpers/examples to perform to common task
@@ -22,23 +24,19 @@ This container extends from [awscli container](https://aws.amazon.com/blogs/deve
 * Apache Cassandra 3.11 branch CQLSH scripts
 * Extends from AWS CLI Container Image and can be accessed via overriding the [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint) parameter
 
-
 # TLDR;
-The following three steps to connect to Amazon Keyspaces using the Toolkit. Clone. Build Image. Connect to Keyspaces and Go!  
+The following steps to connect to Amazon Keyspaces using the Toolkit. Clone. Build Image. Connect to Keyspaces and Go!  
 
 ```sh
-  git clone https://github.com/aws-samples/amazon-keyspaces-toolkit .
-  git submodule update --init --recursive
+docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.gitdocker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
 
-  docker build --tag amazon/keyspaces-toolkit .
-
-  docker run --rm -ti amazon/keyspaces-toolkit \
-   cassandra.us-east-1.amazonaws.com 9142 \
-   -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
-
-   #Voila! You are now connected.
+docker run --rm -ti amazon/keyspaces-toolkit \
+ cassandra.us-east-1.amazonaws.com 9142 \
+ -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
 
 ```
+
+
 
 
 # Table of Contents
@@ -66,7 +64,13 @@ The following three steps to connect to Amazon Keyspaces using the Toolkit. Clon
 
 # Prerequisites
 
-## Setup Docker
+### Generate Service Specific Credentials
+Service-specific credentials enable IAM users to access a specific AWS service. The credentials cannot be used to access other AWS services. They are associated with a specific IAM user and cannot be used by other IAM users.
+
+* See official documentation for IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
+
+
+### Setup Docker
 
 Containers add a level of platform independence allowing for installation on various operating systems including Linux, Mac, and Windows. Find your operating system below, and follow the installation process. After installing, you will have access to the docker terminal from the command line terminal.
 
@@ -74,165 +78,99 @@ Containers add a level of platform independence allowing for installation on var
 * Mac: [Visit Mac Download and Tutorial](https://docs.docker.com/docker-for-mac/install/)
 * Linux: [Visit Linux Download and Tutorial](https://docs.docker.com/engine/install/)
 
-
-## Build Image From Docker file
-
-To start a container, you will need to build the docker image first. The repository is open source and open to customization.  [https://github.com/aws-samples/amazon-keyspaces-toolkit](https://github.com/aws-samples/amazon-keyspaces-toolkit)
-
-`Parameters`
-
-* `--tag`  - is used to give the image a name and version. The tag name provided will be used later when creating the container from the image
-* `.`   -  sets the location of the Dockerfile as the current working directory
-
-```sh
-  git clone https://github.com/aws-samples/amazon-keyspaces-toolkit
-
-  cd amazon-keyspaces-toolkit
-
-  docker build --tag amazon/keyspaces-toolkit .
-```
-
-## Generate Service Specific Credentials
-Service-specific credentials enable IAM users to access a specific AWS service. The credentials cannot be used to access other AWS services. They are associated with a specific IAM user and cannot be used by other IAM users.
-
-* See official documentation for IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
-* You can also use the container by overriding the entrypoint (`--entrypoint aws`). [See the awscli documentation on how to use awscli](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/)
-
-```sh
-aws iam create-service-specific-credential \
-    --user-name alice \
-    --service-name cassandra.amazonaws.com
-```
-
-
-_*Example Output*_
-
-```json
-{
-    "ServiceSpecificCredential": {
-        "CreateDate": "2019-10-09T16:12:04Z",
-        "ServiceName": "cassandra.amazonaws.com",
-        "ServiceUserName": "alice-at-111122223333",
-        "ServicePassword": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
-        "ServiceSpecificCredentialId": "ACCAYFI33SINPGJEBYESF",
-        "UserName": "alice",
-        "Status": "Active"
-    }
-}
-```
-
-
-
-
 # Run
+---
+
 The following section will provide examples of CQLSH usage with Apache Cassandra and Amazon Keyspaces.
 
-## Create and Run Container
-
-After building the image we can then run the container. For more options see Docker's [run command reference](https://docs.docker.com/engine/reference/commandline/run)
-
-`Parameters`
-
-* `--rm` - removes the container after ending the CQLSH session
-* `-ti`  - interactive bash shell in the container
+### Clone this repo
+The following command will clone this repository and pull down submodules
 
 ```sh
-docker run --rm -ti amazon/keyspaces-toolkit \
- cassandra.us-east-1.amazonaws.com 9142 \
- -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
+  git clone --recurse-submodules https://github.com/aws-samples/amazon-keyspaces-toolkit   
 ```
 
-_*Replace SERVICEUSERNAME and SERVICEPASSWORD with [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html)*_
+### Use an alias
+In this section we will assign the previous command to an alias. In simplifying the setup introduced additional commands for Docker. To reduce the extra
+Docker commands we can leverage an alias (or DOSKEY for windows) to replace a
+bulk for the command. The alias acts as a shortcut replacing the text of the Docker command with an alias keyword.
+
+*We do not recommend you store the user name and password in the alias. Later in this document we will show you how to leverage AWS Secrets Manager. to avoid using plain text credentials with CQLSH.*
+
+Parameters for alias
+
+```-v "$(pwd)"``` :/source mount the current directory of the host. Useful for importing
+and exporting data with COPY or using the CQLSH --file command to load external
+CQLSH scripts
+```-v "${HOME}/.cassandra/cqlsh_history"``` Maintain cqlsh history across sessions
+
+```sh
+#!/bin/bash
+
+alias cqlsh='touch ${HOME}/.cassandra/cqlsh_history && docker run --rm -ti -v "$(pwd)":/source -v "${HOME}/.cassandra/cqlsh_history":/root/.cassandra/cqlsh_history amazon/keyspaces-toolkit'
+
+```
+
+You can now connect to Amazon Keyspaces using CQLSH command and pass in the host port and user name and password.
+
+```sh
+cqlsh cassandra.us-east-1.amazonaws.com 9142 --ssl \
+-u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
+```
 
 ## Executing statements
 
 We can also use this container to execute commands using the --execute parameter. For a list of CQLSH commands see the following resource: [List of CQLSH commands](https://cassandra.apache.org/doc/latest/tools/cqlsh.html). This will allow you to embed this functionality in existing scripts.
 
   ```sh
-  docker run --rm -ti amazon/keyspaces-toolkit \
-  cassandra.us-east-1.amazonaws.com 9142 \
+  cqlsh cassandra.us-east-1.amazonaws.com 9142 --ssl \
   -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
-  --execute "CREATE KEYSPACE \"aws\" WITH REPLICATION = {'class': 'SingleRegionStrategy'}"
+  --execute "CREATE KEYSPACE \"amazon\" WITH REPLICATION = {'class': 'SingleRegionStrategy'}"
 ```
 
-## Connect to Apache Cassandra
-To connect to Apache Cassandra override the parameters or provide location of a different cqlshrc file. The following shows how to mount a local directory to docker and configure the container to use a cqlshrc file to configure the connection to an Apache Cassandra cluster.
+## Executing files
 
-To Change SSL Options you can:
-* Override paramters in the command line
-* Override CQLSHRC location with the `--cqlshrc` paramter
+We can also use this container to execute commands using the --file parameter. Since we mounted the current directory with the alias statement we can now utilize scripts on the host machine.
+
+  ```sh
+  cqlsh cassandra.us-east-1.amazonaws.com 9142 \
+  -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
+  --file "/source/my_script.cql"
+```
+
+## Connecting to Apache Cassandra
+To connect to Apache Cassandra override the default CQLSHRC file.
+
+Change the endpoint to the local cassandra clusters
 
 ```sh
-    docker run --rm -ti \
-      -v ~/.aws:/root/.aws \
-      -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
-      amazon/keyspaces-toolkit \
-      SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
-       --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
-       --execute "DESCRIBE TABLE aws.workshop"
+cqlsh localhost 9042 -u "cassandra" -p "cassandra"
 ```
+or using the mount established previous example to load a different CQLSHRC file with the `--cqlshrc` paramter
 
-## Copy Data From Apache Cassandra
-  You can export data from Cassandra clusters by using the CQLSH COPY command. You can export the data to a mounted directory. In this example we use a folder called datadump on the localhost to store the export.
-
-  * `COPY` table to copy from
-  * `TO` the directory to load to. Since we will remove the container after running the process, we will save the export to a mounted directory 'datadump'.
-  * `MAXOUTPUTSIZE` number of lines to export in single file. You can break your data into smaller files to make it easier to load the data into Keyspaces or a different cluster later.  
-  * `HEADER` leave header out since we want to explicitly map columns
-  * `DELIMITER` choose a different delimiter than ',' since it is used in other types such as maps, lists, and sets
-
-  ```sh
-  docker run --rm -ti \
-    -v ~/.aws:/root/.aws \
-    -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
-    -v ~/datadump:/root/datadump \
-    amazon/keyspaces-toolkit \
-    SelfManagedCassandraHost 9042 -u "cassandra" -p "cassandra" \
-     --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
-     --execute "CONSISTENCY LOCAL_ONE;
-           COPY aws.workshop (id,time,event)
-           TO '/root/datadump/export.csv'
-           WITH HEADER=false AND MAXOUTPUTSIZE=5000000 AND DELIMITER='|'"
-  ```
-
-## Copy Data To Amazon Keyspaces
-  We can now copy this data to Amazon Keyspaces by using the COPY FROM command and specifying the mounted directory used in the export process. For best practices on loading data, see [Loading Data into Amazon Keyspaces with cqlsh](https://aws.amazon.com/blogs/database/loading-data-into-amazon-mcs-with-cqlsh/).
-
-
-  #### Shuffle Data for even distribution
-  From the blog we learned that exporting existing data from Cassandra will result in an ordered dataset. Before loading the data to Amazon Keyspaces, it’s recommended to shuffle the data in the CSV to improve the import distribution across data partitions. The following script will shuffle the lines in all files within a directory starting with 'export.csv'.
-
-  ```sh
-  #!/bin/bash
-
-  # For every file in directory perform shuffle and add new file to a directory containing only shuffled data.
-  for filename in export.csv*; do
-     shuf "$filename" -o "shuffled/$filename.shuffled"
-  done
-  ```
-
-#### Load to Amazon Keyspaces
-  * `COPY` table to copy from
-  * `FROM` the directory/file to load from. We use the directory of newly shuffled data 'datadump/shuffled'.
-  * `HEADER` leave header out since we want to explicitly map columns
-  * `DELIMITER` choose a different delimiter than ',' since it is used in other types such as maps, lists, and sets
-  --cqlshrc '/root/.local-cassandra/cqlsh/cqlshrc' \
-  ```sh
-  docker run --rm -ti \
-    -v ~/.aws:/root/.aws \
-    -v ~/.cassandra/cqlsh:/root/.local-cassandra/cqlsh \
-    -v ~/datadump:/root/datadump/shuffled \
-    amazon/keyspaces-toolkit \
-    cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
-     --execute "CONSISTENCY LOCAL_QUORUM;
-           COPY aws.workshop (id,time,event)
-           FROM '/root/datadump/shuffled/*'
-           WITH HEADER=false AND DELIMITER='|'"
-  ```
+```sh
+cqlsh --cqlshrc '/source/.local-cassandra/cqlshrc'
+```
 
 
 # Toolkit
 In this section we will describe usage for the helpers found in the /bin directory. Each example can be used by changing the `entrypoint` to the container.
+
+## AWS CLI
+The keyspaces-toolkit extends the AWS CLI Docker image making the keyspaces-
+toolkit extremely light-weight. Since you may already have the AWS CLI Docker
+image in your local repository, the keyspaces-toolkit adds only an additional 10mb
+layer extension of the AWS CLI.
+
+Changing the entry point to `aws` will allow you to access the AWS CLI. Mounting the `.aws` directory of the host machine will allow you to leverage the credentials stored on the host machine.
+
+```sh
+docker run --rm -ti \
+-v ~/.aws:/root/.aws \
+--entrypoint aws \
+amazon/keyspaces-toolkit
+configure list-profiles
+```
 
 ## AWS Secrets Manager Wrapper
 When using [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) it is common practice to store the username and password in [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/). This allows you to use the AWS CLI to retrieve the credentials and not expose the credentials in plain text. The following script will use the AWS CLI config profile to grab stored service credentials from AWS Secrets Manager.
