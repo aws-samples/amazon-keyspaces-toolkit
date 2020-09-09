@@ -37,31 +37,6 @@ docker run --rm -ti amazon/keyspaces-toolkit \
 ```
 
 
-
-
-# Table of Contents
-
-- [Prerequisites](#prerequisites)
-  * [Setup Docker](#setup-docker)
-  * [Build Image From Docker file](#build-image-from-docker-file)
-  * [Generate Service Specific Credentials](#generate-service-specific-credentials)
-- [Run](#run)
-  * [Create and Run Container](#create-and-run-container)
-  * [Executing statements](#executing-statements)
-  * [Connect to Apache Cassandra](#connect-to-apache-cassandra)
-  * [Copy Data From Apache Cassandra](#copy-data-from-apache-cassandra)
-  * [Copy Data To Amazon Keyspaces](#copy-data-to-amazon-keyspaces)
-      - [Shuffle Data for even distribution](#shuffle-data-for-even-distribution)
-      - [Load to Amazon Keyspaces](#load-to-amazon-keyspaces)
-- [Toolkit](#toolkit)
-  * [AWS Secrets Manager Wrapper](#aws-secrets-manager-wrapper)
-  * [Exponential Backoff Wrapper](#exponential-backoff-wrapper)
-- [Cheatsheet](#cheatsheet)
-- [Security](#security)
-- [License](#license)
-
-
-
 # Prerequisites
 
 ### Generate Service Specific Credentials
