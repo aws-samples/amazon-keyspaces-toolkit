@@ -30,9 +30,7 @@ The following steps to connect to Amazon Keyspaces using the Toolkit. Clone. Bui
 ```sh
 docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
 
-docker run --rm -ti amazon/keyspaces-toolkit \
- cassandra.us-east-1.amazonaws.com 9142 \
- -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
+docker run --rm -ti amazon/keyspaces-toolkit cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
 
 ```
 
