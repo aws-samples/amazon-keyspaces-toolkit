@@ -28,7 +28,7 @@ This container extends from [awscli container](https://aws.amazon.com/blogs/deve
 The following steps to connect to Amazon Keyspaces using the Toolkit. Clone. Build Image. Connect to Keyspaces and Go!  
 
 ```sh
-docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.gitdocker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
+docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
 
 docker run --rm -ti amazon/keyspaces-toolkit \
  cassandra.us-east-1.amazonaws.com 9142 \
