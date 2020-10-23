@@ -18,8 +18,8 @@ mysecret=$(aws secretsmanager get-secret-value --secret-id "$1" --query SecretSt
 
 username=$(jq --raw-output '.username' <<< $mysecret)
 password=$(jq --raw-output '.password' <<< $mysecret)
-host=$(jq --raw-output '.password' <<< $mysecret)
-port=$(jq --raw-output '.password' <<< $mysecret)
+host=$(jq --raw-output '.host' <<< $mysecret)
+port=$(jq --raw-output '.port' <<< $mysecret)
 
 echo "$host $port -u *** -p *** ${@:2}"
 cqlsh "$host $port -u $username -p $password ${@:2}"
