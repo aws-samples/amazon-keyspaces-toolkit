@@ -27,6 +27,8 @@ mysecret=$(aws secretsmanager get-secret-value --secret-id "$1" --query SecretSt
 
 username=$(jq --raw-output '.username' <<< $mysecret)
 password=$(jq --raw-output '.password' <<< $mysecret)
+host=$(jq --raw-output '.host' <<< $mysecret)
+port=$(jq --raw-output '.port' <<< $mysecret)
 
 echo "cqlsh ${@:4} -u **** -p ****"
 
@@ -41,7 +43,7 @@ while [ $success -ne 0 -a $attempts -le $3 -a $SECONDS -le $2  ]
   echo ""
 
   #take paramters starting at $4
-  cqlsh "${@:4}" -u $username -p $password
+  cqlsh $host $port -u $username -p $password "${@:4}"
 
   success=$?
  ((attempts++))
