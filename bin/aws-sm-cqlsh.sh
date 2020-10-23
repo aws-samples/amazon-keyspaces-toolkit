@@ -21,5 +21,5 @@ password=$(jq --raw-output '.password' <<< $mysecret)
 host=$(jq --raw-output '.host' <<< $mysecret)
 port=$(jq --raw-output '.port' <<< $mysecret)
 
-echo "$host $port -u *** -p *** ${@:2}"
-cqlsh "$host $port -u $username -p $password ${@:2}"
+echo "cqlsh" $host $port -u *** -p *** "${@:2}"
+cqlsh $host $port -u $username -p $password "${@:2}"
