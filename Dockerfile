@@ -31,7 +31,7 @@ COPY cassandra/lib/*.zip $CASSANDRA_HOME/lib/
 COPY bin/ $AWS_KEYSPACES_WORKING_DIR/bin/
 
 #Setup pem file
-ADD https://www.amazontrust.com/repository/AmazonRootCA1.pem $CQLSHRC_HOME/AmazonRootCA1.pem
+ADD https://certs.secureserver.net/repository/sf-class2-root.crt $CQLSHRC_HOME/sf-class2-root.crt
 COPY cqlshrc $CQLSHRC_HOME/cqlshrc
 
 ENV PATH="${PATH}:$AWS_KEYSPACES_WORKING_DIR/bin:$CASSANDRA_HOME/bin"

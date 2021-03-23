@@ -4,7 +4,7 @@ factory = cqlshlib.ssl.ssl_transport_factory
 
 [ssl]
 validate = true
-certfile =  /root/.cassandra/AmazonRootCA1.pem
+certfile =  /root/.cassandra/sf-class2-root.crt
 
 [copy]
 NUMPROCESSES=16
