@@ -30,7 +30,7 @@ password=$(jq --raw-output '.password' <<< $mysecret)
 host=$(jq --raw-output '.host' <<< $mysecret)
 port=$(jq --raw-output '.port' <<< $mysecret)
 
-echo "cqlsh ${@:4} -u **** -p ****"
+echo "cqlsh $host $port -u **** -p **** ${@:4}"
 
 while [ $success -ne 0 -a $attempts -le $3 -a $SECONDS -le $2  ]
  do

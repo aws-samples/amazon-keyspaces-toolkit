@@ -14,6 +14,7 @@ This container extends from [awscli container](https://aws.amazon.com/blogs/deve
 * CQLSHRC file with best practices
 * Helpers/examples to perform to common task
 * AWS CLI. Official Documentation [See How to use the AWSCLI Container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/)
+* optional cqlsh expansion that integrates sigv4 authentication
 
 ### Architecture
 ![Figure 1-1](content/static/keyspaces-toolkit-architecture.png "Architecture")
@@ -34,6 +35,14 @@ docker run --rm -ti amazon/keyspaces-toolkit cassandra.us-east-1.amazonaws.com 9
 
 ```
 
+# Using Sigv4 Authentication with cqlsh
+The toolkit contains a version of cqlsh that extends Authentication functionality to leverage the [Sigv4 athentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4). You can leverage this functionality by passing "cqlsh-expansion" to the ```--entrypoint``` docker run parameter, and the ```--sigv4``` flag to the cqlsh-expansion process. You can use the docker container host's credentials by mounting the AWS CLI configuration directory to the container using the mount command ```-v```. If your AWS configuration is stored in ~/.aws then the Docker mount command would be `-v ~/.aws:/root/.aws`.
+
+```sh
+docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
+
+docker run -ti --rm -v ~/.aws:/root/.aws --entrypoint cqlsh-expansion amazon/keyspaces-toolkit cassandra.us-east-1.amazonaws.com --ssl --sigv4
+```
 
 # Prerequisites
 
