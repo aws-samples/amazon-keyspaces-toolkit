@@ -1,6 +1,6 @@
 #  Amazon Keyspaces (for Apache Cassandra) developer toolkit cqlsh expansion
 
-The Amazon Keyspaces toolkit contains common Cassandra tooling and helpers preconfigured for Amazon Keyspaces. The cqlsh-expansion utility extends native cqlsh functionality to include parameters and capabilities specific to Amazon Keyspaces such as tighter IAM integration.
+The Amazon Keyspaces toolkit contains common Cassandra tooling and helpers preconfigured for Amazon Keyspaces. The cqlsh-expansion utility extends native cqlsh functionality to include parameters and capabilities specific to Amazon Keyspaces such as support for Sigv4 Authentication.
 
 
 ## Using the cqlsh-expansion
