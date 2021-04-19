@@ -19,6 +19,7 @@ RUN mkdir $CASSANDRA_HOME && \
     mkdir $CASSANDRA_HOME/pylib  && \
     mkdir $CASSANDRA_HOME/pylib/cqlshlib  && \
     mkdir $AWS_KEYSPACES_WORKING_DIR/bin && \
+    mkdir $AWS_KEYSPACES_WORKING_DIR/distro && \
     mkdir $CQLSHRC_HOME
 
 #CQLSH SETUP
@@ -27,6 +28,9 @@ COPY cassandra/bin/cqlsh cassandra/bin/cqlsh.py $CASSANDRA_HOME/bin/
 COPY cassandra/pylib/ $CASSANDRA_HOME/pylib/
 COPY cassandra/lib/cassandra-driver*.zip $CASSANDRA_HOME/lib/
 COPY cassandra/lib/futures-*.zip $CASSANDRA_HOME/lib/
+
+#ThirdParty License directory
+COPY distro/THIRD-PARTY-LICENSES.txt $AWS_KEYSPACES_WORKING_DIR/distro/
 
 #toolkit helpers
 COPY bin/aws-cqlsh-expo-backoff.sh $AWS_KEYSPACES_WORKING_DIR/bin/aws-cqlsh-expo-backoff.sh
