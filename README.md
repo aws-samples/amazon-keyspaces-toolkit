@@ -278,6 +278,16 @@ find . -type f | wc -l
 #Remove header from csv
 sed -i '1d' myData.csv
 ```
+# Popular Keyspaces Repositories
+
+## Monitoring
+This repository provides CloudFormation templates to quickly set up CloudWatch Metrics for Amazon Keyspaces. Using this template will allow you to get started more easily by providing deployable prebuilt CloudWatch dashboards with commonly observed metrics.
+https://github.com/aws-samples/amazon-keyspaces-cloudwatch-cloudformation-templates
+
+## Java Driver Helpers
+This repository contains driver policies, examples, and best practices when using the DataStax Java Driver with Amazon Keyspaces (for Apache Cassandra)
+https://github.com/aws-samples/amazon-keyspaces-java-driver-helpers
+
 
 # Security
 
