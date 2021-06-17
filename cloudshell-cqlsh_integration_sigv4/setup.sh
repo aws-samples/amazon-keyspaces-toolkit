@@ -5,8 +5,8 @@ echo "Setting up python2 as default python"
 echo "alias python='/usr/bin/python2'" >>  ~/.bashrc
 source ~/.bashrc
 echo " Downloading & installing pip2 for python in home directory"
-curl -LO https://bootstrap.pypa.io/pip/2.7/get-pip.py
-python get-pip.py --user
+curl -LO https://bootstrap.pypa.io/pip/2.7/get-pip.py --output ~/get-pip.py
+python ~/get-pip.py --user
 echo "Installing cassandra-sigv4 using pip2 in home directory"
 pip2 install --user cassandra-sigv4
 echo "Setting up path for cqlsh-expansion"
