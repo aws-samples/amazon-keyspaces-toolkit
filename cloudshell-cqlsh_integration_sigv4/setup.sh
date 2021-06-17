@@ -11,5 +11,6 @@ echo "Installing cassandra-sigv4 using pip2 in home directory"
 pip2 install --user cassandra-sigv4
 echo "Setting up path for cqlsh-expansion"
 export PATH=$PATH:~/amazon-keyspaces-toolkit/cloudshell-cqlsh_integration_sigv4/bin
+echo $PATH
 echo "Copying cqlshrc for cassandra user"
 cp ~/amazon-keyspaces-toolkit/cloudshell-cqlsh_integration_sigv4/cqlshrc ~/.cassandra/cqlshrc
