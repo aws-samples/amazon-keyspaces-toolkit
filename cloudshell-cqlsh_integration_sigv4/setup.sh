@@ -9,6 +9,7 @@ curl -L https://bootstrap.pypa.io/pip/2.7/get-pip.py  -o ~/get-pip.py
 python ~/get-pip.py --user
 echo "Installing cassandra-sigv4 using pip2 in home directory"
 pip2 install --user cassandra-sigv4
+pip2 install --user cqlsh
 echo "Setting up path for cqlsh-expansion"
 export PATH=$PATH:~/amazon-keyspaces-toolkit/cloudshell-cqlsh_integration_sigv4/bin
 echo $PATH
