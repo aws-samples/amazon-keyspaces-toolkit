@@ -1,0 +1,23 @@
+[connection]
+port = 9142
+factory = cqlshlib.ssl.ssl_transport_factory
+
+[ssl]
+validate = true
+certfile = ~/keyspaces.crt
+version = TLSv1_2
+
+[copy]
+NUMPROCESSES=16
+MAXATTEMPTS=25
+
+[copy-from]
+CHUNKSIZE=30
+INGESTRATE=1500
+MAXINSERTERRORS=-1
+MAXPARSEERRORS=-1
+MINBATCHSIZE=1
+MAXBATCHSIZE=10
+
+[csv]
+field_size_limit=999999
