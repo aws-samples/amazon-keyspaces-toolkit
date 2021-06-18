@@ -14,6 +14,7 @@ Use the following commands to download and execute the setup script
 setup script downloads files, cert file and also installs necessary pip dependencies in the home directory so that it's available the next time you start a CloudShell session
 
 The plugin depends on the AWS SDK for Python (Boto3). It uses boto3.Session to obtain credentials. Use following command to connect to keyspaces
+
 ``` cqlsh-expansion cassandra.us-east-2.amazonaws.com 9142 --ssl --sigv4 ```
 ## Functional differences from cqlsh
 
