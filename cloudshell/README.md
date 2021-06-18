@@ -4,15 +4,17 @@ The Amazon Keyspaces toolkit contains common Cassandra tooling and helpers preco
 
 
 ## Using the cqlsh-expansion
-One of the primary reasons to use the cqlsh-expansion utility is for utilizing the Sigv4 Authentication method. The cqlsh-expansion utility supports the [Sigv4 authentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables python applications to use IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4).  To use Siv4 authentication with cqlsh-expansion utility, simply add the `--sigv4` flag to the existing cqlsh command on startup.   
+One of the primary reasons to use the cqlsh-expansion utility is for utilizing the Sigv4 Authentication method. The cqlsh-expansion utility supports the [Sigv4 authentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables python applications to use IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4).  To use Sigv4 authentication with cqlsh-expansion utility, simply add the `--sigv4` flag to the existing cqlsh command on startup.   
 
 Use the following commands to download and execute the setup script
  ``` 
  wget https://raw.githubusercontent.com/Rathan8/amazon-keyspaces-toolkit/master/cloudshell/setup.sh 
  bash setup.sh
  ```
+setup script downloads files, cert file and also installs necessary pip dependencies in the home directory so that it's available the next time you start a CloudShell session
 
-
+The plugin depends on the AWS SDK for Python (Boto3). It uses boto3.Session to obtain credentials. Use following command to connect to keyspaces
+``` cqlsh-expansion cassandra.us-east-2.amazonaws.com 9142 --ssl --sigv4 ```
 ## Functional differences from cqlsh
 
 ### Sigv4 authentication
