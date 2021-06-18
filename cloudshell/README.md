@@ -7,7 +7,8 @@ The Amazon Keyspaces toolkit contains common Cassandra tooling and helpers preco
 One of the primary reasons to use the cqlsh-expansion utility is for utilizing the Sigv4 Authentication method. The cqlsh-expansion utility supports the [Sigv4 authentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables python applications to use IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4).  To use Siv4 authentication with cqlsh-expansion utility, simply add the `--sigv4` flag to the existing cqlsh command on startup.   
 
 Use the following commands to download and execute the setup script
- ``` wget https://raw.githubusercontent.com/Rathan8/amazon-keyspaces-toolkit/master/cloudshell/setup.sh -P ~/ 
+ ``` 
+ wget https://raw.githubusercontent.com/Rathan8/amazon-keyspaces-toolkit/master/cloudshell/setup.sh -P ~/ 
  chmod +x setup.sh
  sh setup.sh
  ```
