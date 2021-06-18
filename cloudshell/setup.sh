@@ -21,4 +21,4 @@ wget  https://raw.githubusercontent.com/aws-samples/amazon-keyspaces-toolkit/mas
 echo " Download the Starfield digital certificate to connect using SSL/TLS"
 curl https://certs.secureserver.net/repository/sf-class2-root.crt --output  ~/.cassandra/keyspaces.crt
 
-sed -i 's;certfile = .*$;certfile = ~/.cassandra/keyspaces.crt;g' cqlshrc
+sed -i 's;certfile = .*$;certfile = ~/.cassandra/keyspaces.crt;g' ~/.cassandra/cqlshrc
