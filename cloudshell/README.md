@@ -8,9 +8,8 @@ One of the primary reasons to use the cqlsh-expansion utility is for utilizing t
 
 Use the following commands to download and execute the setup script
  ``` 
- wget https://raw.githubusercontent.com/Rathan8/amazon-keyspaces-toolkit/master/cloudshell/setup.sh -P ~/ 
- chmod +x setup.sh
- sh setup.sh
+ wget https://raw.githubusercontent.com/Rathan8/amazon-keyspaces-toolkit/master/cloudshell/setup.sh 
+ bash setup.sh
  ```
 
 
