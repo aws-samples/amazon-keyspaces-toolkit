@@ -6,17 +6,12 @@ The Amazon Keyspaces toolkit contains common Cassandra tooling and helpers preco
 ## Using the cqlsh-expansion
 One of the primary reasons to use the cqlsh-expansion utility is for utilizing the Sigv4 Authentication method. The cqlsh-expansion utility supports the [Sigv4 authentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables python applications to use IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4).  To use Siv4 authentication with cqlsh-expansion utility, simply add the `--sigv4` flag to the existing cqlsh command on startup.   
 
-To execute the cqlsh-expansion utility, pass `cqlsh-expansion` to the docker `--entrypoint` parameter on container creation.
+Use the following commands to download and execute the setup script
+ ``` wget https://raw.githubusercontent.com/Rathan8/amazon-keyspaces-toolkit/master/cloudshell/setup.sh -P ~/ 
+ chmod +x setup.sh
+ sh setup.sh
+ ```
 
- The cqlsh-expansion uses the Sigv4 authentication plugin to retrieve the credentials stored in the `.aws` directory. These credentials can be stored on the container or retrieved from the container's host.  We can retrieve the host's credentials by mounting the host's`.aws` directory to the container using the docker mount command ```-v```. For example, if the location for the AWS configuration is stored in `~/.aws` directory then the mount command would be `-v ~/.aws:/root/.aws`.
-
-Use the following command to build the container image and execute a new cqlsh session that authenticates with the credentials from the container host.  
-
-```sh
-docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
-
-docker run -ti --rm -v ~/.aws:/root/.aws --entrypoint cqlsh-expansion amazon/keyspaces-toolkit cassandra.us-east-1.amazonaws.com --sigv4 --ssl
-```
 
 ## Functional differences from cqlsh
 
