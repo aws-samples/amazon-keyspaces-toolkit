@@ -30,7 +30,7 @@ COPY cassandra/lib/cassandra-driver*.zip $CASSANDRA_HOME/lib/
 COPY cassandra/lib/futures-*.zip $CASSANDRA_HOME/lib/
 
 #ThirdParty License directory
-COPY distro/THIRD-PARTY-LICENSES.txt $AWS_KEYSPACES_WORKING_DIR/distro/
+COPY THIRD-PARTY-LICENSES.txt $AWS_KEYSPACES_WORKING_DIR/distro/
 
 #toolkit helpers
 COPY bin/aws-cqlsh-expo-backoff.sh $AWS_KEYSPACES_WORKING_DIR/bin/aws-cqlsh-expo-backoff.sh
