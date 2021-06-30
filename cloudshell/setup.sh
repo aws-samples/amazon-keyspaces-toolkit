@@ -15,14 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DIR="~/.cassandra"
-if [ -d "$DIR" ]; then
-   echo "'$DIR'  exists..."
-else
-    echo "Creating cassandra Dir"
-    mkdir ~/.cassandra
-fi
-
+echo "Creating cassandra Directory if it doesn't exists"
+mkdir -p ~/.cassandra
 
 echo "Downloading & installing pip2 for python2 in home directory"
 curl -L https://bootstrap.pypa.io/pip/2.7/get-pip.py  -o ~/.cassandra/get-pip.py
