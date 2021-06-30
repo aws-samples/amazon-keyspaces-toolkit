@@ -5,7 +5,7 @@ AWS CloudShell is a browser-based shell that makes it easy to securely manage, e
 This toolkit helps with setup of cqlsh-expansion utility to connect to Amazon keyspaces from AWS CloudShell, as part of setup it downloads cqlsh using pip from Python Package Index (PyPI) https://pypi.org/project/cqlsh/
 OR you can install the CQLSH standalone using a binary tarball for more info refer to https://cassandra.apache.org/doc/latest/getting_started/installing.html#installing-the-binary-tarball
 
-Downloads digital certificate to encrypt your connections using Transport Layer Security (TLS), installs necessary pip and other dependencies in home directory so that it persists and available the next time you start a new CloudShell session
+Downloads digital certificate to encrypt your connections using Transport Layer Security (TLS), also installs necessary pip and other dependencies in home directory so that it persists and available the next time you start a new CloudShell session
 
 Run the following commands to download and execute the setup script
  ```
@@ -18,7 +18,9 @@ One of the primary reasons to use the cqlsh-expansion utility is for utilizing t
 The plugin depends on the AWS SDK for Python (Boto3), uses boto3.Session to obtain credentials to connect to Amazon keyspaces
 
 To connect to Amazon keyspaces using cqlsh-expansion
+
 ``` cqlsh-expansion cassandra.us-east-2.amazonaws.com 9142 --ssl --sigv4 ```
+
 ## Additional info
 cqlsh-expansion https://github.com/aws-samples/amazon-keyspaces-toolkit/tree/master/cqlsh-expansion#readme
 
