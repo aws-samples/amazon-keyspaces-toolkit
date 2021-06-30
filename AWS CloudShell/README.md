@@ -5,13 +5,13 @@ AWS CloudShell is a browser-based shell that makes it easy to securely manage, e
 This toolkit helps with setup of cqlsh-expansion utility to connect to Amazon keyspaces from AWS CloudShell, as part of setup it downloads cqlsh using pip from Python Package Index (PyPI) https://pypi.org/project/cqlsh/
 OR you can install the CQLSH standalone using a binary tarball for more info refer to https://cassandra.apache.org/doc/latest/getting_started/installing.html#installing-the-binary-tarball
 
-Also installs necessary pip, cert and other dependencies in home directory so that it persists and available the next time you start a new CloudShell session
+Downloads digital certificate to encrypt your connections using Transport Layer Security (TLS), installs necessary pip and other dependencies in home directory so that it persists and available the next time you start a new CloudShell session
 
 Run the following commands to download and execute the setup script
- ``` 
+ ```
  wget https://raw.githubusercontent.com/aws-samples/amazon-keyspaces-toolkit/master/AWS%20CloudShell/setup.sh
  bash setup.sh 
-```
+ ```
 ## Using the cqlsh-expansion
 One of the primary reasons to use the cqlsh-expansion utility is for utilizing the Sigv4 Authentication method. The cqlsh-expansion utility supports the [Sigv4 authentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables python applications to use IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4). To use Sigv4 authentication with cqlsh-expansion utility, simply add the `--sigv4` flag to the existing cqlsh command on startup.
 
