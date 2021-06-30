@@ -9,7 +9,7 @@ Downloads digital certificate to encrypt your connections using Transport Layer 
 
 Run the following commands to download and execute the setup script
  ```
- wget https://raw.githubusercontent.com/aws-samples/amazon-keyspaces-toolkit/master/AWS%20CloudShell/setup.sh
+ wget https://raw.githubusercontent.com/aws-samples/amazon-keyspaces-toolkit/master/aws-cloudshell/setup.sh
  bash setup.sh 
  ```
 ## Using the cqlsh-expansion
