@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo "Creating cassandra Directory if it doesn't exists"
+echo "Creates cassandra Directory if it doesn't exists"
 mkdir -p ~/.cassandra
 
 echo "Downloading & installing pip2 for python2 in home directory"
