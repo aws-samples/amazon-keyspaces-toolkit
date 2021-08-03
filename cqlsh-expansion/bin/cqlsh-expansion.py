@@ -187,6 +187,7 @@ DEFAULT_SSL = False
 DEFAULT_SIGV4 = False
 DEFAULT_CONNECT_TIMEOUT_SECONDS = 5
 DEFAULT_REQUEST_TIMEOUT_SECONDS = 10
+DEFAULT_AUTH_PROVIDER = 'PlainTextAuthProvider'
 
 DEFAULT_FLOAT_PRECISION = 5
 DEFAULT_DOUBLE_PRECISION = 5
@@ -240,7 +241,8 @@ parser.add_option("--request-timeout", default=DEFAULT_REQUEST_TIMEOUT_SECONDS, 
                   help='Specify the default request timeout in seconds (default: %default seconds).')
 parser.add_option("-t", "--tty", action='store_true', dest='tty',
                   help='Force tty mode (command prompt).')
-parser.add_option("--sigv4", action='store_true', help='Use SigV4AuthProvider plugin for autentication and authorization', default=False)
+parser.add_option("--sigv4", action='store_true', help='Use SigV4AuthProvider plugin for autentication and authorization', default=DEFAULT_SIGV4)
+parser.add_option("--auth-provider", help="The AuthProvider to use when connecting. Default is PlainTextAuthProvider", dest='auth_provider_name', default=DEFAULT_AUTH_PROVIDER)
 
 optvalues = optparse.Values()
 (options, arguments) = parser.parse_args(sys.argv[1:], values=optvalues)
@@ -474,11 +476,18 @@ class Shell(cmd.Cmd):
         if hasattr(options, 'sigv4'):
           my_session = boto3.session.Session()
           self.auth_provider = SigV4AuthProvider(my_session)
-        else:
-          if username:
-              if not password:
-                  password = getpass.getpass()
-              self.auth_provider = PlainTextAuthProvider(username=username, password=password)
+        elif hasattr(options, 'auth_provider_name'):
+          if options.auth_provider_name == 'SigV4AuthProvider':
+            my_session = boto3.session.Session()
+            self.auth_provider = SigV4AuthProvider(my_session)
+          elif auth_provider_name == DEFAULT_AUTH_PROVIDER:
+            if username:
+               if not password:
+                   password = getpass.getpass()
+               self.auth_provider = PlainTextAuthProvider(username=username, password=password)
+            else:
+              raise SyntaxError('cqlsh-expansion.py Invalid parameter for auth-provider. "%s" is not a valid AuthProvider' % (auth_provider,))
+
 
         self.username = username
         self.keyspace = keyspace
@@ -1800,7 +1809,8 @@ class Shell(cmd.Cmd):
                          display_timezone=self.display_timezone,
                          max_trace_wait=self.max_trace_wait, ssl=self.ssl,
                          request_timeout=self.session.default_timeout,
-                         connect_timeout=self.conn.connect_timeout)
+                         connect_timeout=self.conn.connect_timeout,
+                         auth_provider=self.auth_provider)
         subshell.cmdloop()
         f.close()
 
@@ -2276,7 +2286,6 @@ def read_options(cmdlineargs, environment):
     optvalues.debug = False
     optvalues.file = None
     optvalues.ssl = option_with_default(configs.getboolean, 'connection', 'ssl', DEFAULT_SSL)
-    optvalues.sigv4 = option_with_default(configs.getboolean, 'authentication', 'sigv4', DEFAULT_SIGV4)
 
     optvalues.no_compact = False
     optvalues.encoding = option_with_default(configs.get, 'ui', 'encoding', UTF8)
@@ -2298,6 +2307,7 @@ def read_options(cmdlineargs, environment):
     except ValueError:
         parser.error('"%s" is not a valid connect timeout.' % (options.connect_timeout,))
         options.connect_timeout = DEFAULT_CONNECT_TIMEOUT_SECONDS
+
 
     try:
         options.request_timeout = int(options.request_timeout)

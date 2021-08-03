@@ -67,6 +67,14 @@ docker run --rm -t  amazon/keyspaces-toolkit \
                 --ssl -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" \
                 --execute "CONSISTENCY LOCAL_QUORUM; COPY toolkit_test.backofftest TO 'data.csv';COPY toolkit_test.backofftest FROM 'data.csv';";
 
+
+docker run --rm -t   \
+                -v "$(pwd)":/source \
+                amazon/keyspaces-toolkit \
+                $HOST $PORT \
+                --ssl -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" \
+                --file /source/test.cql
+
 docker run --rm -t amazon/keyspaces-toolkit \
               $HOST $PORT \
               -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" --ssl \
@@ -144,6 +152,14 @@ docker run --rm -t  \
              amazon/keyspaces-toolkit $SECRETKEY $HOST $PORT --ssl \
             --execute "CONSISTENCY LOCAL_QUORUM; COPY sm_toolkit_test.backofftest TO 'data.csv';COPY sm_toolkit_test.backofftest FROM 'data.csv';";
 
+docker run --rm -t  \
+           -v "$(pwd)":/source \
+           -v ~/.aws:/root/.aws \
+           --entrypoint  aws-sm-cqlsh.sh \
+           amazon/keyspaces-toolkit $SECRETKEY $HOST $PORT --ssl \
+          --file /source/test.cql
+
+
 docker run --rm -t \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh \
@@ -153,7 +169,7 @@ docker run --rm -t \
 echo "Finished sm helper tests"
 
 #cqlsh-expansion test
-echo "cqlsh-expansion tests"
+echo "cqlsh-expansion tests sigv4"
 
 docker run --rm -t \
    -v ~/.aws:/root/.aws \
@@ -221,10 +237,99 @@ docker run --rm -t  \
               amazon/keyspaces-toolkit $HOST $PORT --ssl --sigv4 \
             --execute "CONSISTENCY LOCAL_QUORUM; COPY expansion_toolkit_test.backofftest TO 'data.csv';COPY expansion_toolkit_test.backofftest FROM 'data.csv';";
 
+docker run --rm -t  \
+               -v ~/.aws:/root/.aws \
+               -v "$(pwd)":/source \
+               --entrypoint cqlsh-expansion \
+                amazon/keyspaces-toolkit $HOST $PORT --ssl --sigv4 \
+               --file /source/test.cql
+
 docker run --rm -t \
             -v ~/.aws:/root/.aws \
             --entrypoint cqlsh-expansion \
              amazon/keyspaces-toolkit $HOST $PORT --ssl --sigv4 \
              --execute "DROP KEYSPACE expansion_toolkit_test;"
 
-echo "Finished cqlsh-expansion tests"
+#cqlsh-expansion auth test
+ echo "cqlsh-expansion tests sigv4"
+
+ docker run --rm -t \
+    -v ~/.aws:/root/.aws \
+    --entrypoint cqlsh-expansion \
+    amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+    --execute "SHOW VERSION; SHOW HOST;"
+
+#connect without sigv4
+ docker run --rm -t --entrypoint cqlsh-expansion \
+            amazon/keyspaces-toolkit $HOST $PORT \
+            -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" --ssl \
+            --execute "SHOW VERSION; SHOW HOST;"
+
+ docker run --rm -t \
+     -v ~/.aws:/root/.aws \
+     --entrypoint cqlsh-expansion \
+     amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+     --execute "CREATE KEYSPACE expansion_toolkit_test_auth WITH REPLICATION = {'class': 'SingleRegionStrategy'};"
+
+  docker run --rm -t \
+     -v ~/.aws:/root/.aws \
+     --entrypoint aws-cqlsh-expansion-expo-backoff.sh \
+     amazon/keyspaces-toolkit  30 120 $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+      --execute "DESCRIBE KEYSPACE expansion_toolkit_test_auth;"
+
+  docker run --rm -t \
+          -v ~/.aws:/root/.aws \
+          --entrypoint cqlsh-expansion \
+           amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+           --execute "CREATE TABLE expansion_toolkit_test_auth.backofftest (
+            id text,
+            name text,
+            description text,
+            details map<text,text>,
+            PRIMARY KEY(id, name))
+            WITH CUSTOM_PROPERTIES = {'capacity_mode':{'throughput_mode':'PAY_PER_REQUEST'}};"
+
+ docker run --rm -t \
+            -v ~/.aws:/root/.aws \
+            --entrypoint aws-cqlsh-expansion-expo-backoff.sh \
+            amazon/keyspaces-toolkit  30 120 $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+              --execute "DESCRIBE TABLE expansion_toolkit_test_auth.backofftest;"
+
+ docker run --rm -t \
+             -v ~/.aws:/root/.aws \
+             --entrypoint cqlsh-expansion \
+              amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+            --execute "CONSISTENCY LOCAL_QUORUM; INSERT INTO expansion_toolkit_test_auth.backofftest(id, name, description, details) VALUES('1', 'abc', 'xyz', {'key1':'value1'});"
+
+ docker run --rm -t  \
+            -v ~/.aws:/root/.aws \
+            --entrypoint cqlsh-expansion \
+             amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+           --execute "CONSISTENCY LOCAL_QUORUM; SERIAL CONSISTENCY LOCAL_SERIAL; INSERT INTO expansion_toolkit_test_auth.backofftest(id, name, description, details) VALUES('2', 'efg', 'hij', {'key2':'value2'}) IF NOT EXISTS;"
+
+ docker run --rm -t  \
+            -v ~/.aws:/root/.aws \
+            --entrypoint cqlsh-expansion \
+             amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+             --execute "CONSISTENCY LOCAL_QUORUM; SELECT * FROM expansion_toolkit_test_auth.backofftest;"
+
+ docker run --rm -t  \
+              -v ~/.aws:/root/.aws \
+              --entrypoint cqlsh-expansion \
+               amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+              --execute "CONSISTENCY LOCAL_QUORUM; COPY expansion_toolkit_test_auth.backofftest TO 'data.csv';COPY expansion_toolkit_test_auth.backofftest FROM 'data.csv';";
+
+ docker run --rm -t  \
+              -v ~/.aws:/root/.aws \
+              -v "$(pwd)":/source \
+              --entrypoint cqlsh-expansion \
+               amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+              --file /source/test.cql
+
+ docker run --rm -t \
+             -v ~/.aws:/root/.aws \
+             --entrypoint cqlsh-expansion \
+              amazon/keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
+              --execute "DROP KEYSPACE expansion_toolkit_test_auth;"
+
+echo "Finished cqlsh-expansion sigv4 tests"
