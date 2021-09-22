@@ -1,4 +1,4 @@
-[submodule "cassandra"]
-	path = cassandra
-	url = https://github.com/apache/cassandra.git
-	branch = cassandra-3.11
+; [submodule "cassandra"]
+; 	path = cassandra
+; 	url = https://github.com/apache/cassandra.git
+; 	branch = cassandra-3.11

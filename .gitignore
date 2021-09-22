@@ -1,1 +1,6 @@
 .DS_Store
+# Ignore the build directories
+/cqlsh-expansion/cqlsh_expansion.egg-info
+/cqlsh-expansion/build
+/cqlsh-expansion/dist
+.idea
