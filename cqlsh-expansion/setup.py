@@ -8,20 +8,20 @@ setup(
         "six>=1.15.0",
         "urllib3>=1.26.2",
         "python_dateutil>=2.8.1",
-        "cassandra-driver>=3.25.0",
+        "cassandra-driver>=3.12.0,<3.18.0",
         "botocore",
         "boto3",
         "cassandra-sigv4>=4.0.2",
     ],
-    include_package_data=True,
     packages=["config", "cqlshlib"],
+    package_data={'config':  ['*']},
+    include_package_data=True,
     package_dir={
         "": ".",
-        "cqlshlib": "./pylib/cqlshlib",
-    },
+        "cqlshlib": "./pylib/cqlshlib"},
+    exclude_package_data={'.': ['./pylib/cqlshlib/test']},
     entry_points={
         'console_scripts': [
-            'cqlsh-expansion.init=config.set:expansion_config',
-        ],
+            'cqlsh-expansion.init=config.post_install:initialize_cassandra_directory'],
     },
 )
