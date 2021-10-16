@@ -13,9 +13,10 @@
 #IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 #CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+# pyproject.toml is the specified file format of PEP 518 which contains the build system requirements of Python projects. https://www.python.org/dev/peps/pep-0518/
+# pip can read pyproject.toml and what version of setuptools or wheel one may need.
+# https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
+
 [build-system]
-requires = [
-    "cqlsh>=5.0.4",
-    "cassandra-sigv4>=4.0.2"
-]
+requires = ["setuptools>=43.0.0","wheel"]
 build-backend = "setuptools.build_meta"

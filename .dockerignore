@@ -1,4 +1,4 @@
 #Ignore files on build
 
-cassandra/pylib/cqlshlib/test
-cassandra/pylib/cassandra-cqlsh-tests.sh
+cqlsh-expansion/pylib/cqlshlib/test
+cqlsh-expansion/pylib/cassandra-cqlsh-tests.sh
