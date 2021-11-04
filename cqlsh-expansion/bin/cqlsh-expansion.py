@@ -480,14 +480,17 @@ class Shell(cmd.Cmd):
           if options.auth_provider_name == 'SigV4AuthProvider':
             my_session = boto3.session.Session()
             self.auth_provider = SigV4AuthProvider(my_session)
-          elif auth_provider_name == DEFAULT_AUTH_PROVIDER:
+          elif options.auth_provider_name == DEFAULT_AUTH_PROVIDER:
             if username:
                if not password:
                    password = getpass.getpass()
                self.auth_provider = PlainTextAuthProvider(username=username, password=password)
             else:
               raise SyntaxError('cqlsh-expansion.py Invalid parameter for auth-provider. "%s" is not a valid AuthProvider' % (auth_provider,))
-
+        elif username:
+            if not password:
+                password = getpass.getpass()
+            self.auth_provider = PlainTextAuthProvider(username=username, password=password)
 
         self.username = username
         self.keyspace = keyspace
