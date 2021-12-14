@@ -58,4 +58,4 @@ COPY cqlsh-expansion/config/cqlshrc_template $CQLSHRC_HOME/cqlshrc
 
 ENV PATH="${PATH}:$AWS_KEYSPACES_WORKING_DIR/bin:$CASSANDRA_HOME/bin"
 
-ENTRYPOINT ["cqlsh"]
+ENTRYPOINT ["cqlsh-expansion"]

@@ -1,8 +1,6 @@
 #  Amazon Keyspaces (for Apache Cassandra) developer toolkit
 
-This repository provides a Docker image for common tooling for Amazon Keyspaces. Keyspaces for functional testing, light operations, and data migration.
-
-The toolkit is optimized for Amazon Keyspaces, but will also work with Apache Cassandra clusters.
+This repository provides common tooling for Amazon Keyspaces for functional testing, light operations, and data migration. The tooling is packaged as a Docker image or python package to simplify setup and configuration. The toolkit is optimized for Amazon Keyspaces, but will also work with Apache Cassandra clusters.
 
 ## Amazon Keyspaces (for Apache Cassandra)
 [Amazon Keyspaces](https://aws.amazon.com/keyspaces/) is a scalable, highly available, and managed Apache Cassandra–compatible database service. Amazon Keyspaces is serverless, so you pay for only the resources you use and the service can automatically scale tables up and down in response to application traffic.
@@ -10,11 +8,12 @@ The toolkit is optimized for Amazon Keyspaces, but will also work with Apache Ca
 ## What's included
 This container extends from [awscli container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/) and includes the following Cassandra components:
 * 3.11.6 Apache Cassandra distribution of CQLSH
+* cqlsh expansion that integrates sigv4 authentication
 * Amazon Web Services pem file for SSL connectivity
 * CQLSHRC file with best practices
 * Helpers/examples to perform to common task
 * AWS CLI. Official Documentation [See How to use the AWSCLI Container](https://aws.amazon.com/blogs/developer/aws-cli-v2-docker-image/)
-* optional cqlsh expansion that integrates sigv4 authentication
+
 
 ### Architecture
 ![Figure 1-1](content/static/keyspaces-toolkit-architecture.png "Architecture")
@@ -26,30 +25,49 @@ This container extends from [awscli container](https://aws.amazon.com/blogs/deve
 * Extends from AWS CLI Container Image and can be accessed via overriding the [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint) parameter
 
 # TLDR;
-The following steps to connect to Amazon Keyspaces using the Toolkit. Clone. Build Image. Connect to Keyspaces and Go!  
+The following steps to connect to Amazon Keyspaces using the Toolkit.
 
+## Docker
+Clone the github repoistory, Build Docker Image, Connect to Keyspaces, and Go!  
 ```sh
-docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
+docker build --tag amazon/amazon-keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
 
-docker run --rm -ti amazon/keyspaces-toolkit cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
+docker run --rm -ti amazon/amazon-keyspaces-toolkit cassandra.us-east-1.amazonaws.com 9142 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl
+
+```
+
+## Python
+```sh
+pip install --user cqlsh-expansion
+
+cqlsh-expansion.init
+
+cqlsh cassandra.us-east-1.amazonaws.com 9142 --ssl -u mike-user-99 -p user-pass-01
 
 ```
 
 # Using Sigv4 Authentication with cqlsh
-The toolkit contains a version of cqlsh that extends Authentication functionality to leverage the [Sigv4 athentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4). You can leverage this functionality by passing "cqlsh-expansion" to the ```--entrypoint``` docker run parameter, and the ```--auth-provider "SigV4AuthProvider"``` flag to the cqlsh-expansion process. You can use the docker container host's credentials by mounting the AWS CLI configuration directory to the container using the mount command ```-v```. If your AWS configuration is stored in ~/.aws then the Docker mount command would be `-v ~/.aws:/root/.aws`.
+The toolkit contains a version of cqlsh that extends Authentication functionality to leverage the [Sigv4 athentication plugin for the Python Cassandra driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin). This plugin enables IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4). You can leverage this functionality by passing the ```--auth-provider "SigV4AuthProvider"``` flag to the cqlsh-expansion process. You can use the docker container host's credentials by mounting the AWS CLI configuration directory to the container using the mount command ```-v```. If your AWS configuration is stored in ~/.aws then the Docker mount command would be `-v ~/.aws:/root/.aws`.
 
+## Docker
 ```sh
-docker build --tag amazon/keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
+docker build --tag amazon/amazon-keyspaces-toolkit --build-arg CLI_VERSION=latest https://github.com/aws-samples/amazon-keyspaces-toolkit.git
 
-docker run -ti --rm -v ~/.aws:/root/.aws --entrypoint cqlsh-expansion amazon/keyspaces-toolkit cassandra.us-east-1.amazonaws.com --ssl --auth-provider "SigV4AuthProvider"
+docker run -ti --rm -v ~/.aws:/root/.aws amazon/amazon-keyspaces-toolkit cassandra.us-east-1.amazonaws.com --ssl --auth-provider "SigV4AuthProvider"
 ```
+## Python
+```sh
+pip install --user cqlsh-expansion
 
+cqlsh-expansion.init
+
+cqlsh-expansion cassandra.us-east-1.amazonaws.com 9142 --ssl --auth-provider "SigV4AuthProvider"
+
+```
 # Prerequisites
 
 ### Generate Service Specific Credentials
-Service-specific credentials enable IAM users to access a specific AWS service. The credentials cannot be used to access other AWS services. They are associated with a specific IAM user and cannot be used by other IAM users.
-
-* See official documentation for IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
+If you are using the Service-specific credentials for IAM users to access Amazon Keyspaces. See official documentation for IAM user [Generated service-specific credentials](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.credentials.html) for Amazon Keyspaces
 
 
 ### Setup Docker
@@ -69,7 +87,7 @@ The following section will provide examples of CQLSH usage with Apache Cassandra
 The following command will clone this repository and pull down submodules
 
 ```sh
-  git clone --recurse-submodules https://github.com/aws-samples/amazon-keyspaces-toolkit   
+  git clone https://github.com/aws-samples/amazon-keyspaces-toolkit   
 ```
 
 ### Use an alias
@@ -89,11 +107,11 @@ CQLSH scripts
 ```sh
 #!/bin/bash
 
-alias cqlsh='touch ${HOME}/.cassandra/cqlsh_history && docker run --rm -ti -v "$(pwd)":/source -v "${HOME}/.cassandra/cqlsh_history":/root/.cassandra/cqlsh_history amazon/keyspaces-toolkit'
+alias cqlsh='touch ${HOME}/.cassandra/cqlsh_history && docker run --rm -ti -v "$(pwd)":/source -v "${HOME}/.cassandra/cqlsh_history":/root/.cassandra/cqlsh_history amazon/amazon-keyspaces-toolkit'
 
 ```
 
-You can now connect to Amazon Keyspaces using CQLSH command and pass in the host port and user name and password.
+You can now connect to Amazon Keyspaces using CQLSH alias and pass in the host port and user name and password.
 
 ```sh
 cqlsh cassandra.us-east-1.amazonaws.com 9142 --ssl \
@@ -150,7 +168,7 @@ Changing the entry point to `aws` will allow you to access the AWS CLI. Mounting
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws \
-amazon/keyspaces-toolkit
+amazon/amazon-keyspaces-toolkit
 configure list-profiles
 ```
 
@@ -185,7 +203,7 @@ _*Example: open cqlsh shell*_
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh \
- amazon/keyspaces-toolkit keyspaces-credentials \
+ amazon/amazon-keyspaces-toolkit keyspaces-credentials \
  cassandra.us-east-1.amazonaws.com 9142 --ssl
 ```
 _*Example: execute statement*_
@@ -193,7 +211,7 @@ _*Example: execute statement*_
 docker run --rm -ti \
 -v ~/.aws:/root/.aws \
 --entrypoint aws-sm-cqlsh.sh  \
- amazon/keyspaces-toolkit keyspaces-credentials \
+ amazon/amazon-keyspaces-toolkit keyspaces-credentials \
  cassandra.us-east-1.amazonaws.com 9142 --ssl \
  --execute "CREATE TABLE aws.workshop(
 	id text,
@@ -205,7 +223,7 @@ docker run --rm -ti \
 ```
 
 ## Exponential Backoff Wrapper
-Keyspace and table creation are Asynchronous in Amazon Keyspaces. This asynchronous functionality is different than Apache Cassandra where table creation is synchronous. We have been told by customers that some existing scripts require synchronous behavior when creating a table. A common solution is to add an exponential backoff describe statement to notify users when the table is created. This container contains an exponential backoff helper that will attempt multiple times until the CQL statement succeeds. Other options include building a CloudFormation template.
+Keyspace and table creation are Asynchronous in Amazon Keyspaces. This asynchronous functionality is different than Apache Cassandra where table creation is synchronous. We have been told by customers that some existing scripts require synchronous behavior when creating a table. A common solution is to add an exponential backoff describe statement to notify users when the table is created. This container contains an exponential backoff helper that will attempt multiple times until the CQL statement succeeds.
 
 `Parameters`
 * $1 maximum time for program to run in seconds
@@ -216,7 +234,7 @@ Keyspace and table creation are Asynchronous in Amazon Keyspaces. This asynchron
 #!/bin/bash
 
 #create a table
-docker run -ti --name createtablec amazon/keyspaces-toolkit \
+docker run -ti --name createtablec amazon/amazon-keyspaces-toolkit \
 cassandra.us-east-1.amazonaws.com 9142 \
 -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" --ssl \
 --execute "CREATE TABLE aws.workshop_backofftest(
@@ -235,7 +253,7 @@ docker rm createtablec
 
 #exponential backoff describe
 #run for 30 seconds or 120 attempts which ever comes first
-docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh amazon/keyspaces-toolkit \
+docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh amazon/amazon-keyspaces-toolkit \
  30 120 \
  cassandra.us-east-1.amazonaws.com 9142 \
  --ssl -u "SERVICEUSERNAME" -p "SERVICEPASSWORD" \
@@ -251,7 +269,7 @@ docker run --rm -ti --entrypoint aws-cqlsh-expo-backoff.sh amazon/keyspaces-tool
 $> docker logs CONTAINERID
 
 #Remove Image
-$> docker rmi amazon/keyspaces-toolkit
+$> docker rmi amazon/amazon-keyspaces-toolkit
 
 #exit code
 docker inspect createtablec --format='{{.State.ExitCode}}'
