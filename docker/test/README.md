@@ -13,6 +13,7 @@ Simple test to execute cqlsh and additional entrypoints provided in the toolkit
 ```sh
 #!/bin/bash
 
-> ./toolkit-test.sh SERVICEUSERNAME SERVICEUSERPASSWORD keyspaces-credentials cassandra.us-east-1.amazonaws.com 9142
+> docker/test/toolkit-test.sh testuser+1-at-963740746376 gUuus3wDFt9Oli6mLeY7G+arlGdlL/ExampleKey= examplesecret4 cassandra.us-east-1.amazonaws.com 9142
+
 
 ```
