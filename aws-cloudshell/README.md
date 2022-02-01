@@ -104,6 +104,7 @@ pip cache purge
 rm -f ~/.cassandra/get-pip.py
 `
 
+
 `
 pip uninstall cqlsh-expansion
 `
