@@ -19,7 +19,6 @@ The following curl command uses the get-pip.py script to install pip. As a resul
 `
 curl -L https://bootstrap.pypa.io/pip/2.7/get-pip.py -o/tmp/get-pip.py
 `
-
 `
 python2 /tmp/get-pip.py
 `
@@ -34,10 +33,10 @@ This command installs the cqlsh-expansion python package using pip which is a pa
 `
 pip install cqlsh-expansion --user
 `
-`
-Setup cqlsh-expansion to connect to Amazon Keyspaces
-`
 
+
+
+## Setup cqlsh-expansion to connect to Amazon Keyspaces
 
 
 To use the cqlsh-expansion with Amazon Keyspaces you can use the following post install script or follow the instructions found in the official Amazon Keyspaces documentation. (https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.cqlsh.html)
@@ -45,9 +44,7 @@ By default the cqlsh-expansion is not configured with ssl enabled, but the packa
 
 
 
-### This command will Configure the Toolkit  your cqlsh-expansion
-
-
+This command will Configure the Toolkit  your cqlsh-expansion
 
 `
 cqlsh-expansion.init
@@ -59,11 +56,11 @@ cqlsh-expansion.init
 
 Now that you have you cqlsh-expansion installed and have set up the configuration for SSL communication with Amazon Keyspaces, you can now connect to the Amazon Keyspaces services using your IAM access keys or Service Specific Credentials.
 
-## Choose a region and endpoint
+### Choose a region and endpoint
 
 To connect to Amazon Keyspaces you will need to choose one of the service endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.endpoints.html). You can also connect to Amazon Keyspaces using Interface VPC endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/vpc-endpoints.html) to enable private communication between your Virtual Private Cloud (VPC) running in Amazon VPC and Amazon Keyspaces. For example, to connect to the Keyspaces service in US East (N. Virginia) (us-east-1) you will want to use the cassandra.us-east-1.amazonaws.com (http://cassandra.us-east-1.amazonaws.com/) service endpoint. All communication with Amazon Keyspaces will be over port 9142
 
-## Choose authentication method and connect
+### Choose authentication method and connect
 
 To provide users and applications with credentials for programmatic access to Amazon Keyspaces resources, you can do either of the following:
 
@@ -104,6 +101,8 @@ Clean up pip cache & remove unnecessary files
 `
 pip cache purge
 rm -f ~/.cassandra/get-pip.py
+`
+`
 pip uninstall cqlsh-expansion
 `
 
@@ -116,11 +115,11 @@ pip uninstall cqlsh-expansion
 
 Instead of using the service specific credentials for an IAM user, you can use the --auth-provider "SigV4AuthProvider" parameter to leverage the Sigv4 authentication plugin for temporary credentials. This plugin enables IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4). The plugin depends on the AWS SDK for Python (Boto3) and the Amazon Keyspaces Sigv4 plugin for the DataStax python driver (https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin).
 
-New output for TTY
+### New output for TTY
 
 When creating a new cqlsh session with the cqlsh-expansion utility, it will show the default consistency level after establishing a new connection. We find customers using cqlsh may not be aware of the default consistency level of ONE, and additional transparency will lead to better operational excellence.
 
-COPY FROM/TO required Consistency Levels
+### COPY FROM/TO required Consistency Levels
 
 When executing the COPY FROM import operation from the cqlsh-expansion utility, LOCAL_QUORUM will be strictly enforced. Executing COPY FROM with consistency level other than LOCAL_QUORUM will result in a SyntaxError. This restriction provides better experience when using COPY FROM with Amazon Keyspaces. Amazon Keyspaces replicates all write operations three times across multiple Availability Zones for durability and high availability. Writes are durably stored before they are acknowledged using the LOCAL_QUORUM consistency level. When executing the COPY TO export operation from the cqlsh-expansion utility, consistency of ONE, LOCAL_ONE, or LOCAL_QUORUM will be strictly enforced. Executing COPY FROM with consistency level other than these three will result in a SyntaxError. This restriction provides a better experience when using COPY FROM with Amazon Keyspaces.
 
