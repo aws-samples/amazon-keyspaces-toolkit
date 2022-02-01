@@ -7,7 +7,7 @@ The AWS CloudShell is a convenient pre-authenticated browser based shell that gi
 ## Prerequisites to install cqlsh-expansion in AWS CloudShell
 
 
-In this section, we will prepare the AWS CloudShell for installation. The preferred method of installation is through pip. pip is the [package installer] (https://packaging.python.org/guides/tool-recommendations/) for Python. You can use pip to install packages from the Python Package Index (https://pypi.org/) and other indexes. The cqlsh-expansion requires python 2 so you have to verify the what version python the Cloudshell is running  before installing cqlsh-expansion.
+In this section, we will prepare the AWS CloudShell for installation. The preferred method of installation is through pip. pip is the [package installer (https://packaging.python.org/guides/tool-recommendations/) for Python. You can use pip to install packages from the Python Package Index (https://pypi.org/) and other indexes. The cqlsh-expansion requires python 2 so you have to verify the what version python the Cloudshell is running  before installing cqlsh-expansion.
 
 `
 python --version
