@@ -53,6 +53,7 @@ cqlsh-expansion.init
 
 
 
+
 ## Connection to Amazon Keyspaces
 
 Now that you have you cqlsh-expansion installed and have set up the configuration for SSL communication with Amazon Keyspaces, you can now connect to the Amazon Keyspaces services using your IAM access keys or Service Specific Credentials.
