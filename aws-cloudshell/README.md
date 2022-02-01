@@ -131,8 +131,8 @@ When executing the COPY FROM import operation from the cqlsh-expansion utility, 
 
 ### Additional info
 
-AWS CloudShell https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html
-Cqlsh-expansion package https://pypi.org/project/cqlsh-expansion/
+[AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html)
+[Cqlsh-expansion package](https://pypi.org/project/cqlsh-expansion/)
 
 
 # License
