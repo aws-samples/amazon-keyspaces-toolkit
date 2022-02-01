@@ -45,7 +45,7 @@ By default the cqlsh-expansion is not configured with ssl enabled, but the packa
 
 
 
-This command will Configure the Toolkit  your cqlsh-expansion
+This command will configure the Toolkit  your cqlsh-expansion
 
 `
 cqlsh-expansion.init
@@ -56,11 +56,11 @@ cqlsh-expansion.init
 
 ## Connection to Amazon Keyspaces
 
-Now that you have you cqlsh-expansion installed and have set up the configuration for SSL communication with Amazon Keyspaces, you can now connect to the Amazon Keyspaces services using your IAM access keys or Service Specific Credentials.
+Now that you have you cqlsh-expansion installed and have set up the configuration for SSL communication with Amazon Keyspaces, you can connect to the Amazon Keyspaces services using your IAM access keys or Service Specific Credentials.
 
 ### Choose a region and endpoint
 
-To connect to Amazon Keyspaces you will need to choose one of the service endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.endpoints.html). You can also connect to Amazon Keyspaces using Interface VPC endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/vpc-endpoints.html) to enable private communication between your Virtual Private Cloud (VPC) running in Amazon VPC and Amazon Keyspaces. For example, to connect to the Keyspaces service in US East (N. Virginia) (us-east-1) you will want to use the cassandra.us-east-1.amazonaws.com (http://cassandra.us-east-1.amazonaws.com/) service endpoint. All communication with Amazon Keyspaces will be over port 9142
+To connect to Amazon Keyspaces you will need to choose one of the service endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.endpoints.html). You can also connect to Amazon Keyspaces using Interface VPC endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/vpc-endpoints.html) to enable private communication between your Virtual Private Cloud (VPC) running in Amazon VPC and Amazon Keyspaces. For example, to connect to the Keyspaces service in US East (N. Virginia) (us-east-1) you will want to use the cassandra.us-east-1.amazonaws.com (http://cassandra.us-east-1.amazonaws.com/) service endpoint. All communication with Amazon Keyspaces will be over port 9142.
 
 ### Choose authentication method and connect
 
