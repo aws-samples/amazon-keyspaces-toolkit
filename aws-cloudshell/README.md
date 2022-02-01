@@ -62,11 +62,11 @@ Now that you have you cqlsh-expansion installed and have set up the configuratio
 
 To connect to Amazon Keyspaces you will need to choose one of the service endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.endpoints.html). You can also connect to Amazon Keyspaces using Interface VPC endpoints (https://docs.aws.amazon.com/keyspaces/latest/devguide/vpc-endpoints.html) to enable private communication between your Virtual Private Cloud (VPC) running in Amazon VPC and Amazon Keyspaces. For example, to connect to the Keyspaces service in US East (N. Virginia) (us-east-1) you will want to use the cassandra.us-east-1.amazonaws.com (http://cassandra.us-east-1.amazonaws.com/) service endpoint. All communication with Amazon Keyspaces will be over port 9142.
 
-### Choose authentication method and connect
+## Choose authentication method and connect
 
 To provide users and applications with credentials for programmatic access to Amazon Keyspaces resources, you can do either of the following:
 
-Connect with IAM access keys (users,roles, and federated identities)
+### Connect with IAM access keys (users,roles, and federated identities)
 
 For enhanced security, we recommend creating IAM access keys for IAM users and roles that are used across all AWS services. To use IAM access keys to connect to Amazon Keyspaces, customers can use the Signature Version 4 Process (SigV4) authentication plugin for Cassandra client drivers. To learn more about how the Amazon Keyspaces SigV4 plugin enables IAM users, roles, and federated identities (https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) to authenticate Amazon Keyspaces API requests, see AWS Signature Version 4 process (SigV4) (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html). You can use the Sigv4 plugin with the cqlsh-expansion script by providing the following flag: --auth-provider "SigV4AuthProvider" . The Sigv4 plugin depends on the AWS SDK for Python (Boto3) which is included in the requirements file. You will also need to set the the proper credentials to make service calls. You can use the following tutorial to set up credentials using the AWS CLI. (https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html)
 After you have the credentials set up with privileges (https://docs.aws.amazon.com/keyspaces/latest/devguide/security_iam_service-with-iam.html) to access Amazon Keyspaces system tables, you can execute the following command to connect to Amazon Keyspaces with CQLSH using the Sigv4 process.
