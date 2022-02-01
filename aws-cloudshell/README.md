@@ -19,6 +19,7 @@ The following curl command uses the get-pip.py script to install pip. As a resul
 `
 curl -L https://bootstrap.pypa.io/pip/2.7/get-pip.py -o/tmp/get-pip.py
 `
+
 `
 python2 /tmp/get-pip.py
 `
