@@ -1,7 +1,7 @@
 # Using the Amazon Keyspaces Toolkit  from AWS CloudShell
 
 
-The AWS CloudShell is a convenient pre-authenticated browser based shell that gives you a secure and easy way to manage and interact with your AWS resources. In addition, AWS CloudShell offers persistent storage of 1 GB for each AWS region at no additional cost. The persistent storage is located in your home directory ($HOME) and is private to you. Unlike ephemeral environment resources that are recycled after each shell session ends, data in your home directory persists between sessions. CloudShell is outside of the VPC and needs to communicate with the Amazon Keyspaces public endpoint.  The Amazon Keyspaces Toolkit contains common Cassandra tooling and helpers that come preconfigured for Amazon Keyspaces its light weight and supports the Sigv4 Authentication plugin, and cqlsh without having to download the full distribution. This make the toolkit lightweight. Now you can access the Amazon Keyspaces tool kit through the AWS Cloud Shell. In this readme file are the steps to install the Amazon Keyspaces toolkit in your cloud shell environment.
+The AWS CloudShell is a convenient pre-authenticated browser based shell that gives you a secure and easy way to manage and interact with your AWS resources. In addition, AWS CloudShell offers persistent storage of 1 GB for each AWS region at no additional cost. The persistent storage is located in your home directory ($HOME) and is private to you. Unlike ephemeral environment resources that are recycled after each shell session ends, data in your home directory persists between sessions. CloudShell is outside of the VPC and needs to communicate with the Amazon Keyspaces public endpoint.  The Amazon Keyspaces Toolkit contains common Cassandra tooling and helpers that come preconfigured for Amazon Keyspaces, it's lightweight and supports the Sigv4 Authentication plugin, and you can execute cqlsh without having to download the full distribution. This makes the toolkit lightweight. Now you can access the Amazon Keyspaces tool kit through the AWS Cloud Shell. In this readme file are the steps to install the Amazon Keyspaces toolkit in your cloud shell environment.
 
 
 ## Prerequisites to install cqlsh-expansion in AWS CloudShell
@@ -28,8 +28,8 @@ python2 /tmp/get-pip.py
 ## Installing cqlsh-expansion on CloudShell
 
 
-Now that you have pip installed, you can now install the cqlsh-expansion into your home directory.
-This command installs the cqlsh-expansion python package using pip which is a package manager to install it. Use the following command to install the cqlsh-expansion into the CloudShell. Installing the cqlsh-expansion into the home directory will enable it to be persisted between sessions.
+Now that you have pip installed, you can install the cqlsh-expansion into your home directory.
+Use the following command to install the cqlsh-expansion into the CloudShell. Installing the cqlsh-expansion into the home directory will enable it to be persisted between sessions.
 
 `
 pip install cqlsh-expansion --user
