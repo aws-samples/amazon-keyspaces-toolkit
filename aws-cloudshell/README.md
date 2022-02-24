@@ -62,7 +62,7 @@ Now that weve installed the cqlsh-expansion and have set up the configuration fo
 
 For us to connect to Amazon Keyspaces you will need to choose one of the [service endpoints](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.endpoints.html). You can also connect to Amazon Keyspaces using [Interface VPC endpoints](https://docs.aws.amazon.com/keyspaces/latest/devguide/vpc-endpoints.html) to enable private communication between your Virtual Private Cloud (VPC) running in Amazon VPC and Amazon Keyspaces. For example, to connect to the Keyspaces service in US East (N. Virginia) (us-east-1) [you will want to use the cassandra.us-east-1.amazonaws.com](http://cassandra.us-east-1.amazonaws.com/) service endpoint. All communication with Amazon Keyspaces will be over port 9142.
 
-## Choossing authentication method and connect
+## Chossing authentication method and connect
 
 To provide users and applications with credentials for programmatic access to Amazon Keyspaces resources, you can do either of the following:
 
