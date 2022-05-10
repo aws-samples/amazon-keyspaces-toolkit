@@ -16,7 +16,7 @@ echo $PORT
 #example run from the root of the project
 #docker/test/toolkit-test.sh testuser+1-at-963740746376 gUuus3wDFt9Oli6mLeY7G+arlGdlL/ExampleKey= examplesecret4 cassandra.us-east-1.amazonaws.com 9142
 
-docker build --tag amazon/amazon-keyspaces-toolkit -f docker/Dockerfile . --build-arg CLI_VERSION=latest
+docker build --tag amazon/amazon-keyspaces-toolkit -f Dockerfile . --build-arg CLI_VERSION=latest
 
 docker run --rm -t --entrypoint cqlsh amazon/amazon-keyspaces-toolkit --version
 
