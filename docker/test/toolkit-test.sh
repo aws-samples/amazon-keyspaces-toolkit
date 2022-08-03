@@ -82,7 +82,7 @@ docker run --rm -t   \
                 --entrypoint cqlsh amazon/amazon-keyspaces-toolkit \
                 $HOST $PORT \
                 --ssl -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" \
-                --file /source/test/test.cql
+                --file /source/docker/test/test.cql
 
 docker run --rm -t --entrypoint cqlsh amazon/amazon-keyspaces-toolkit \
               $HOST $PORT \
@@ -166,7 +166,7 @@ docker run --rm -t  \
            -v ~/.aws:/root/.aws \
            --entrypoint  aws-sm-cqlsh.sh \
            amazon/amazon-keyspaces-toolkit $SECRETKEY $HOST $PORT --ssl \
-          --file /source/test/test.cql
+          --file /source/docker/test/test.cql
 
 
 docker run --rm -t \
@@ -243,7 +243,7 @@ docker run --rm -t  \
                -v ~/.aws:/root/.aws \
                -v "$(pwd)":/source \
                 amazon/amazon-keyspaces-toolkit $HOST $PORT --ssl --sigv4 \
-               --file /source/test/test.cql
+               --file /source/docker/test/test.cql
 
 docker run --rm -t \
             -v ~/.aws:/root/.aws \
@@ -316,7 +316,7 @@ docker run --rm -t \
               -v ~/.aws:/root/.aws \
               -v "$(pwd)":/source \
                amazon/amazon-keyspaces-toolkit $HOST $PORT --ssl --auth-provider "SigV4AuthProvider" \
-              --file /source/test/test.cql
+              --file /source/docker/test/test.cql
 
  docker run --rm -t \
              -v ~/.aws:/root/.aws \
