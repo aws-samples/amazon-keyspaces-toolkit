@@ -28,11 +28,11 @@
 ;; module and class will be used to dynamically load the class
 ;; all other properties found here and in the credentials file under the class name
 ;; will be passed to the constructor
-#module = cassandra_sigv4.auth
-#classname = SigV4AuthProvider
-#region_name = us-east-1
-module = cassandra.auth
-classname = PlainTextAuthProvider
+module = cassandra_sigv4.auth
+classname = SigV4AuthProvider
+region_name = us-east-1
+; module = cassandra.auth
+; classname = PlainTextAuthProvider
 
 [ui]
 ;; Whether or not to display query results with colors
@@ -123,7 +123,7 @@ certfile = ~/.cassandra/sf-class2-root.crt
 
 ; this is effectively ignored from 4.1 included as TLS protocol is auto-negotiated and will
 ; be removed in the next major version of Cassandra, possible values were TLSv1, TLSv1_1 or TLSv1_2
-;version =
+;version = TLSv1_2
 
 ;; Optional section, overrides default certfile in [ssl] section, if present
 ; [certfiles]

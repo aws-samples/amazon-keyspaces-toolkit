@@ -36,6 +36,7 @@ from contextlib import contextmanager
 from glob import glob
 from io import StringIO
 from uuid import UUID
+from ssl import SSLContext, PROTOCOL_TLSv1_2, CERT_REQUIRED
 
 if sys.version_info < (3, 6):
     sys.exit("\ncqlsh requires Python 3.6+\n")
@@ -131,7 +132,7 @@ except ImportError as e:
              'Error: %s\n' % (sys.executable, sys.path, e))
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import Cluster
+from cassandra.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT
 from cassandra.cqltypes import cql_typename
 from cassandra.marshal import int64_unpack
 from cassandra.metadata import (ColumnMetadata, KeyspaceMetadata, TableMetadata)
@@ -145,7 +146,7 @@ cqlshlibdir = os.path.join(CASSANDRA_PATH, 'pylib')
 if os.path.isdir(cqlshlibdir):
     sys.path.insert(0, cqlshlibdir)
 
-from cqlshlib import cql3handling, pylexotron, sslhandling, cqlshhandling, authproviderhandling
+from cqlshlib import cql3handling, pylexotron, sslhandling, cqlshhandling, authproviderhandling, legacydesc3x
 from cqlshlib.copyutil import ExportTask, ImportTask
 from cqlshlib.displaying import (ANSI_RESET, BLUE, COLUMN_NAME_COLORS, CYAN,
                                  RED, WHITE, FormattedValue, colorme)
@@ -155,7 +156,7 @@ from cqlshlib.formatting import (DEFAULT_DATE_FORMAT, DEFAULT_NANOTIME_FORMAT,
 from cqlshlib.tracing import print_trace, print_trace_session
 from cqlshlib.util import get_file_encoding_bomsize, trim_if_present
 from cqlshlib.util import is_file_secure
-
+from cqlshlib.legacydesc3x import *
 
 DEFAULT_HOST = '127.0.0.1'
 DEFAULT_PORT = 9042
@@ -233,17 +234,16 @@ parser.add_option("--insecure-password-without-warning", action='store_true', de
 opt_values = optparse.Values()
 (options, arguments) = parser.parse_args(sys.argv[1:], values=opt_values)
 
-# WARN message for deprecated options
+# Raise Exception for deprecated options
 if hasattr(options, 'sigv4'):
-    print('\nWarning: Specified sigv4 flag was deprecated, refer to cqlshrc file for sigv4 authentication'
+    raise Exception('\nWarning: Specified sigv4 flag was deprecated, refer to cqlshrc file for sigv4 authentication'
           'https://cassandra.apache.org/_/blog/Apache-Cassandra-4.1-Features-Authentication-Plugin-Support-for-CQLSH.html')
 
 if hasattr(options, 'auth_provider_name'):
-    print('\nWarning: auth-provider flag was deprecated, refer to cqlshrc file for authentication'
+    raise Exception('\nWarning: auth-provider flag was deprecated, refer to cqlshrc file for authentication'
           'https://cassandra.apache.org/_/blog/Apache-Cassandra-4.1-Features-Authentication-Plugin-Support-for-CQLSH.html')
 
 # BEGIN history/config definition
-
 
 def mkdirp(path):
     """Creates all parent directories up to path parameter or fails when path exists, but it is not a directory."""
@@ -261,7 +261,6 @@ def resolve_cql_history_file():
         return os.environ['CQL_HISTORY']
     else:
         return default_cql_history
-
 
 HISTORY = resolve_cql_history_file()
 HISTORY_DIR = os.path.dirname(HISTORY)
@@ -477,6 +476,12 @@ class Shell(cmd.Cmd):
         self.tracing_enabled = tracing_enabled
         self.page_size = self.default_page_size
         self.expand_enabled = expand_enabled
+        Keypsaces_profile = ExecutionProfile(
+            consistency_level=cassandra.ConsistencyLevel.LOCAL_QUORUM,
+            request_timeout=request_timeout,   
+            row_factory = ordered_dict_factory,
+            load_balancing_policy=WhiteListRoundRobinPolicy([self.hostname]))
+
         if use_conn:
             self.conn = use_conn
         else:
@@ -486,11 +491,12 @@ class Shell(cmd.Cmd):
             self.conn = Cluster(contact_points=(self.hostname,), port=self.port, cql_version=cqlver,
                                 auth_provider=self.auth_provider,
                                 ssl_options=sslhandling.ssl_settings(hostname, CONFIG_FILE) if ssl else None,
-                                load_balancing_policy=WhiteListRoundRobinPolicy([self.hostname]),
                                 control_connection_timeout=connect_timeout,
-                                connect_timeout=connect_timeout,
+                                connect_timeout=connect_timeout, 
+                                execution_profiles={EXEC_PROFILE_DEFAULT: Keypsaces_profile},
                                 **kwargs)
         self.owns_connection = not use_conn
+
 
         if keyspace:
             self.session = self.conn.connect(keyspace)
@@ -511,9 +517,11 @@ class Shell(cmd.Cmd):
 
         self.display_timezone = display_timezone
 
-        self.session.default_timeout = request_timeout
-        self.session.row_factory = ordered_dict_factory
-        self.session.default_consistency_level = cassandra.ConsistencyLevel.ONE
+        ##### These configurations are moved to EXEC_PROFILE_DEFAULT
+        # self.session.default_timeout = request_timeout
+        # self.session.row_factory = ordered_dict_factory
+        # self.session.default_consistency_level = cassandra.ConsistencyLevel.ONE
+
         self.get_connection_versions()
         self.set_expanded_cql_version(self.connection_versions['cql'])
 
@@ -628,15 +636,6 @@ class Shell(cmd.Cmd):
             'cql': result['cql_version'],
         }
         self.connection_versions = vers
-
-    def get_keyspace_names(self):
-        return list(self.conn.metadata.keyspaces.keys())
-
-    def get_columnfamily_names(self, ksname=None):
-        if ksname is None:
-            ksname = self.current_keyspace
-
-        return list(self.get_keyspace_meta(ksname).tables.keys())
 
     def get_materialized_view_names(self, ksname=None):
         if ksname is None:
@@ -1370,11 +1369,14 @@ class Shell(cmd.Cmd):
             will not work in cqlsh connected to Cassandra < 4.0.In cqlsh-expansion we have modified code to support describe statements for 
             Cassandra 3.11  
         """
-        try:
+        stmt = SimpleStatement(parsed.extract_orig(), consistency_level=cassandra.ConsistencyLevel.LOCAL_ONE, fetch_size=self.page_size if self.use_paging else None)
+        future = self.session.execute_async(stmt)
 
+        if self.connection_versions['build'][0] < '4':
+          try:
             what = parsed.matched[1][1].lower()
             if what == 'keyspaces':
-                self.describe_keyspaces()
+                describe_keyspaces_3x(self)
             elif what == 'keyspace':
                 ksname = self.cql_unprotect_name(parsed.get_binding('ksname', ''))
                 if not ksname:
@@ -1382,19 +1384,19 @@ class Shell(cmd.Cmd):
                     if ksname is None:
                         self.printerr('Not in any keyspace.')
                         return
-                self.describe_keyspace(ksname)
+                describe_keyspace_3x(self, ksname)
             elif what in ('columnfamily', 'table'):
                 ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
                 cf = self.cql_unprotect_name(parsed.get_binding('cfname'))
-                self.describe_columnfamily(ks, cf)
+                describe_columnfamily_3x(self, ks, cf)
             elif what in ('columnfamilies', 'tables'):
-                self.describe_columnfamilies(self.current_keyspace)
+                describe_columnfamilies_3x(self, self.current_keyspace)
             elif what == 'desc ':
-                self.describe_schema(False)
+                describe_schema_3x(self, False)
             elif what == 'full' and parsed.matched[2][1].lower() == 'schema':
-                self.describe_schema(True)
+                describe_schema_3x(self, True)
             elif what == 'cluster':
-                self.describe_cluster()    
+                describe_cluster_3x(self)    
             elif what:
                 ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
                 name = self.cql_unprotect_name(parsed.get_binding('cfname'))
@@ -1402,85 +1404,51 @@ class Shell(cmd.Cmd):
                     name = self.cql_unprotect_name(parsed.get_binding('idxname', None))
                 if not name:
                     name = self.cql_unprotect_name(parsed.get_binding('mvname', None))
-                self.describe_object(ks, name)        
-
-        except CQL_ERRORS as err:
+                describe_object_3x(self, ks, name) 
+          except CQL_ERRORS as err:
             err_msg = err.message if hasattr(err, 'message') else str(err)
             self.printerr(err_msg.partition("message=")[2].strip('"'))
-        except Exception:
+          except Exception:
             import traceback
             self.printerr(traceback.format_exc())
 
+        else:
+            try:
+                result = future.result()
+                what = parsed.matched[1][1].lower()
+
+                if what in ('columnfamilies', 'tables', 'types', 'functions', 'aggregates'):
+                    self.describe_list(result)
+                elif what == 'keyspaces':
+                    self.describe_keyspaces(result)
+                elif what == 'cluster':
+                    self.describe_cluster(result)
+                elif what:
+                    self.describe_element(result)
+
+            except CQL_ERRORS as err:
+                err_msg = err.message if hasattr(err, 'message') else str(err)
+                self.printerr(err_msg.partition("message=")[2].strip('"'))
+            except Exception:
+                import traceback
+                self.printerr(traceback.format_exc())
+
+            if future:
+                if future.warnings:
+                    self.print_warnings(future.warnings)
+
+
     do_desc = do_describe
 
-    def print_recreate_keyspace(self, ksdef, out):
-        out.write(ksdef.export_as_string())
-        out.write("\n")
-    
-    def print_recreate_columnfamily(self, ksname, cfname, out):
-        """
-        Output CQL commands which should be pasteable back into a CQL session
-        to recreate the given table.
-        Writes output to the given out stream.
-        """
-        out.write(self.get_table_meta(ksname, cfname).export_as_string())
-        out.write("\n")
-    
-    def print_recreate_object(self, ks, name, out):
-        """
-        Output CQL commands which should be pasteable back into a CQL session
-        to recreate the given object (ks, table or index).
-        Writes output to the given out stream.
-        """
-        out.write(self.get_object_meta(ks, name).export_as_string())
-        out.write("\n")
-
-    def describe_keyspaces(self):
+    def describe_keyspaces(self, rows):
         """
         Print the output for a DESCRIBE KEYSPACES query
         """
+        names = [r['name'] for r in rows]
+
         print('')
-        cmd.Cmd.columnize(self, self.get_keyspace_names())
-        print('')    
-
-    def describe_keyspace(self, ksname):
-        print
-        self.print_recreate_keyspace(self.get_keyspace_meta(ksname), sys.stdout)
-        print
-    
-    def describe_columnfamily(self, ksname, cfname):
-        if ksname is None:
-            ksname = self.current_keyspace
-        if ksname is None:
-            raise NoKeyspaceError("No keyspace specified and no current keyspace")
-        print
-        self.print_recreate_columnfamily(ksname, cfname, sys.stdout)
-        print
-    
-    def describe_columnfamilies(self, ksname):
-        print
-        if ksname is None:
-            for k in self.get_keyspaces():
-                name = k.name
-                print('Keyspace %s' % name)
-                print('---------%s' % ('-' * len(name)))
-                cmd.Cmd.columnize(self, self.get_columnfamily_names(k.name))
-                print
-        else:
-            cmd.Cmd.columnize(self, self.get_columnfamily_names(ksname))
-            print
-    
-    def describe_schema(self, include_system=False):
-        print
-        for k in self.get_keyspaces():
-            if include_system or k.name not in cql3handling.SYSTEM_KEYSPACES:
-                self.print_recreate_keyspace(k, sys.stdout)
-                print
-
-    def describe_object(self, ks, name):
-        print
-        self.print_recreate_object(ks, name, sys.stdout)
-        print
+        cmd.Cmd.columnize(self, names)
+        print('')  
     
     def describe_list(self, rows):
         """
@@ -1518,19 +1486,22 @@ class Shell(cmd.Cmd):
             self.query_out.write(row['create_statement'])
             print('')
 
-    def describe_cluster(self):
-        print('\nCluster: %s' % self.get_cluster_name())
-        p = trim_if_present(self.get_partitioner(), 'org.apache.cassandra.dht.')
-        print('Partitioner: %s\n' % p)
-        # TODO: snitch?
-        # snitch = trim_if_present(self.get_snitch(), 'org.apache.cassandra.locator.')
-        # print 'Snitch: %s\n' % snitch
-        if self.current_keyspace is not None and self.current_keyspace != 'system':
-            print("Range ownership:")
-            ring = self.get_ring(self.current_keyspace)
-            for entry in ring.items():
-                print(' %39s  [%s]' % (str(entry[0].value), ', '.join([host.address for host in entry[1]])))
-            print
+    def describe_cluster(self, rows):
+        """
+        Print the output for a DESCRIBE CLUSTER query.
+
+        If a specified keyspace was in use the returned ResultSet will contains a 'range_ownership' column,
+        otherwise not.
+        """
+        for row in rows:
+            print('\nCluster: %s' % row['cluster'])
+            print('Partitioner: %s' % row['partitioner'])
+            print('Snitch: %s\n' % row['snitch'])
+            if 'range_ownership' in row:
+                print("Range ownership:")
+                for entry in list(row['range_ownership'].items()):
+                    print(' %39s  [%s]' % (entry[0], ', '.join([host for host in entry[1]])))
+                print('')
     
     def do_copy(self, parsed):
         r"""
@@ -1613,7 +1584,6 @@ class Shell(cmd.Cmd):
         When entering CSV data on STDIN, you can use the sequence "\."
         on a line by itself to end the data input.
         """
-
         ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
         if ks is None:
             ks = self.current_keyspace

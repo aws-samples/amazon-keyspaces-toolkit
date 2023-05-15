@@ -1,6 +1,6 @@
 #Amazon Keyspaces toolkit
 
-ARG CLI_VERSION=latest
+ARG CLI_VERSION=2.1.27
 FROM amazon/aws-cli:$CLI_VERSION
 
 ENV AWS_KEYSPACES_WORKING_DIR=/root
