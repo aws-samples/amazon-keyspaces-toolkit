@@ -17,15 +17,44 @@ from cassandra.metadata import (ColumnMetadata, KeyspaceMetadata, TableMetadata)
 from cassandra.cqltypes import cql_typename
 from cqlshlib.util import trim_if_present
 from cqlshlib import cql3handling
-
 import  cmd, sys
+try:
+    import cassandra
+except ImportError as e:
+    sys.exit("\nPython Cassandra driver not installed, or not on PYTHONPATH.\n"
+             'You might try "pip install cassandra-driver".\n\n'
+             'Python: %s\n'
+             'Module load path: %r\n\n'
+             'Error: %s\n' % (sys.executable, sys.path, e))
 
-
+from cassandra.auth import PlainTextAuthProvider
+from cassandra.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT
+from cassandra.cqltypes import cql_typename
+from cassandra.marshal import int64_unpack
+from cassandra.metadata import (ColumnMetadata, KeyspaceMetadata, TableMetadata)
+from cassandra.policies import WhiteListRoundRobinPolicy
+from cassandra.query import SimpleStatement, ordered_dict_factory, TraceUnavailable
+from cassandra.util import datetime_from_timestamp
 class NoKeyspaceError(Exception):
     pass
 
 class ObjectNotFound(Exception):
     pass
+
+cqlruleset = None
+
+CQL_ERRORS = (
+    cassandra.AlreadyExists, cassandra.AuthenticationFailed, cassandra.CoordinationFailure,
+    cassandra.InvalidRequest, cassandra.Timeout, cassandra.Unauthorized, cassandra.OperationTimedOut,
+    cassandra.cluster.NoHostAvailable,
+    cassandra.connection.ConnectionBusy, cassandra.connection.ProtocolError, cassandra.connection.ConnectionException,
+    cassandra.protocol.ErrorMessage, cassandra.protocol.InternalError, cassandra.query.TraceUnavailable
+)
+
+def cql_unprotect_name(self, namestr):
+    if namestr is None:
+        return
+    return cqlruleset.dequote_name(namestr)
 
 def get_object_meta(self, ks, name):
         if name is None:
@@ -140,3 +169,43 @@ def describe_cluster_3x(self):
             for entry in ring.items():
                 print(' %39s  [%s]' % (str(entry[0].value), ', '.join([host.address for host in entry[1]])))
             print
+
+def do_describe_3x(self, parsed):
+          try:
+            what = parsed.matched[1][1].lower()
+            if what == 'keyspaces':
+                describe_keyspaces_3x(self)
+            elif what == 'keyspace':
+                ksname = self.cql_unprotect_name(parsed.get_binding('ksname', ''))
+                if not ksname:
+                    ksname = self.current_keyspace
+                    if ksname is None:
+                        self.printerr('Not in any keyspace.')
+                        return
+                describe_keyspace_3x(self, ksname)
+            elif what in ('columnfamily', 'table'):
+                ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
+                cf = self.cql_unprotect_name(parsed.get_binding('cfname'))
+                describe_columnfamily_3x(self, ks, cf)
+            elif what in ('columnfamilies', 'tables'):
+                describe_columnfamilies_3x(self, self.current_keyspace)
+            elif what == 'desc ':
+                describe_schema_3x(self, False)
+            elif what == 'full' and parsed.matched[2][1].lower() == 'schema':
+                describe_schema_3x(self, True)
+            elif what == 'cluster':
+                describe_cluster_3x(self)    
+            elif what:
+                ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
+                name = self.cql_unprotect_name(parsed.get_binding('cfname'))
+                if not name:
+                    name = self.cql_unprotect_name(parsed.get_binding('idxname', None))
+                if not name:
+                    name = self.cql_unprotect_name(parsed.get_binding('mvname', None))
+                describe_object_3x(self, ks, name) 
+          except CQL_ERRORS as err:
+            err_msg = err.message if hasattr(err, 'message') else str(err)
+            self.printerr(err_msg.partition("message=")[2].strip('"'))
+          except Exception:
+            import traceback
+            self.printerr(traceback.format_exc())

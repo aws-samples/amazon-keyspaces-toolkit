@@ -1373,45 +1373,7 @@ class Shell(cmd.Cmd):
         future = self.session.execute_async(stmt)
 
         if self.connection_versions['build'][0] < '4':
-          try:
-            what = parsed.matched[1][1].lower()
-            if what == 'keyspaces':
-                describe_keyspaces_3x(self)
-            elif what == 'keyspace':
-                ksname = self.cql_unprotect_name(parsed.get_binding('ksname', ''))
-                if not ksname:
-                    ksname = self.current_keyspace
-                    if ksname is None:
-                        self.printerr('Not in any keyspace.')
-                        return
-                describe_keyspace_3x(self, ksname)
-            elif what in ('columnfamily', 'table'):
-                ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
-                cf = self.cql_unprotect_name(parsed.get_binding('cfname'))
-                describe_columnfamily_3x(self, ks, cf)
-            elif what in ('columnfamilies', 'tables'):
-                describe_columnfamilies_3x(self, self.current_keyspace)
-            elif what == 'desc ':
-                describe_schema_3x(self, False)
-            elif what == 'full' and parsed.matched[2][1].lower() == 'schema':
-                describe_schema_3x(self, True)
-            elif what == 'cluster':
-                describe_cluster_3x(self)    
-            elif what:
-                ks = self.cql_unprotect_name(parsed.get_binding('ksname', None))
-                name = self.cql_unprotect_name(parsed.get_binding('cfname'))
-                if not name:
-                    name = self.cql_unprotect_name(parsed.get_binding('idxname', None))
-                if not name:
-                    name = self.cql_unprotect_name(parsed.get_binding('mvname', None))
-                describe_object_3x(self, ks, name) 
-          except CQL_ERRORS as err:
-            err_msg = err.message if hasattr(err, 'message') else str(err)
-            self.printerr(err_msg.partition("message=")[2].strip('"'))
-          except Exception:
-            import traceback
-            self.printerr(traceback.format_exc())
-
+            do_describe_3x(self, parsed)
         else:
             try:
                 result = future.result()

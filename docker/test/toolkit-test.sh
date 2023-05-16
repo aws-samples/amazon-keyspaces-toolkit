@@ -218,8 +218,9 @@ docker run --rm -t \
 
 #connect without sigv4
 docker run --rm -t \
+           -v "$(pwd)":/source \
            amazon/amazon-keyspaces-toolkit $HOST $PORT \
-           -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" --ssl \
+           -u "$SERVICEUSERNAME" -p "$SERVICEPASSWORD" --ssl --cqlshrc="/source/docker/test/default_cqlshrc" \
            --execute "SHOW VERSION; SHOW HOST;"
 
 # cqlsh-expansion tests with auth provider SigV4AuthProvider from cqlshrc file

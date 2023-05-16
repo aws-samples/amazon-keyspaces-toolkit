@@ -30,7 +30,7 @@
 ;; will be passed to the constructor
 module = cassandra_sigv4.auth
 classname = SigV4AuthProvider
-region_name = us-east-1
+;region_name = us-east-1
 ; module = cassandra.auth
 ; classname = PlainTextAuthProvider
 
