@@ -9,8 +9,25 @@ ENV CQLSHRC_HOME=$AWS_KEYSPACES_WORKING_DIR/.cassandra
 
 WORKDIR $AWS_KEYSPACES_WORKING_DIR
 
+#Install python3 and set as python3 simlink 
+
+RUN yum install gcc openssl-devel bzip2-devel libffi-devel gzip make tar -y
+RUN curl https://www.python.org/ftp/python/3.7.9/Python-3.7.9.tgz --output Python-3.7.9.tgz
+RUN tar xzf Python-3.7.9.tgz
+WORKDIR $AWS_KEYSPACES_WORKING_DIR/Python-3.7.9
+RUN ./configure --enable-optimizations
+RUN make altinstall
+RUN export PATH=${PATH}:/usr/local/lib/
+RUN ln -s /usr/local/bin/python3.7 /usr/bin/python3
+WORKDIR $AWS_KEYSPACES_WORKING_DIR
+RUN rm -f Python-3.7.9.tgz
+
 #Install jq
 RUN yum install -y jq && yum clean all
+
+#set as python3 as default interpreter
+RUN unlink /usr/bin/python
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 #setup directory structure
 RUN mkdir $CASSANDRA_HOME && \

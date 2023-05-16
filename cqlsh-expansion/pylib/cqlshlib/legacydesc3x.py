@@ -90,7 +90,6 @@ def describe_keyspaces_3x(self):
         print('')    
 
 def describe_keyspace_3x(self, ksname):
-        print('calling print_recreate')
         print_recreate_keyspace(self, self.get_keyspace_meta(ksname), sys.stdout)
         print
     

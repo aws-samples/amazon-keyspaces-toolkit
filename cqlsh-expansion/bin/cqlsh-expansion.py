@@ -114,7 +114,7 @@ if cql_zip:
     sys.path.insert(0, os.path.join(cql_zip, 'cassandra-driver-' + ver))
 
 # the driver needs dependencies
-third_parties = ('six-', 'pure_sasl-')
+third_parties = ('six-', 'pure_sasl-', 'futures-', 'cassandra_sigv4-', 'boto3-', 'botocore-', 'python_dateutil-', 'urllib3-', 'jmespath-')
 
 for lib in third_parties:
     lib_zip = find_zip(lib)
