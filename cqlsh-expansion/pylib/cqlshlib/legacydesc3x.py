@@ -189,7 +189,7 @@ def do_describe_3x(self, parsed):
                 describe_columnfamily_3x(self, ks, cf)
             elif what in ('columnfamilies', 'tables'):
                 describe_columnfamilies_3x(self, self.current_keyspace)
-            elif what == 'desc ':
+            elif what == 'schema':
                 describe_schema_3x(self, False)
             elif what == 'full' and parsed.matched[2][1].lower() == 'schema':
                 describe_schema_3x(self, True)
