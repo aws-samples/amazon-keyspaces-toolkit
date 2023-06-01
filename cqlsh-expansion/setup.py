@@ -6,9 +6,9 @@ setup(
     install_requires=[
         "futures>=2.1.6",
         "six>=1.15.0",
-        "urllib3>=1.26.2",
-        "python_dateutil>=2.8.1",
-        "cassandra-driver>=3.12.0,<3.18.0",
+        "urllib3",
+        "python_dateutil",
+        "cassandra-driver>=3.25.0",
         "botocore",
         "boto3",
         "cassandra-sigv4>=4.0.2",

@@ -14,12 +14,12 @@
 #$1 secret-id
 #$2 CQL statement
 
-mysecret=$(aws secretsmanager get-secret-value --secret-id "$1" --query SecretString --output text)
+mysecret=$(aws secretsmanager get-secret-value --secret-id "$1" --region "$2" --query SecretString --output text)
 
 username=$(jq --raw-output '.username' <<< $mysecret)
 password=$(jq --raw-output '.password' <<< $mysecret)
 host=$(jq --raw-output '.host' <<< $mysecret)
 port=$(jq --raw-output '.port' <<< $mysecret)
 
-echo "executing.. cqlsh" $host $port "-u *** -p *** ${@:2}"
-cqlsh $host $port -u $username -p $password "${@:2}"
+echo "executing.. cqlsh" $host $port "-u *** -p *** ${@:3}"
+cqlsh-expansion $host $port -u $username -p $password "${@:3}"

@@ -9,20 +9,14 @@ The Amazon Keyspaces toolkit contains common Cassandra tooling and helpers preco
 To install the cqlsh-expansion python package you can run the following pip command. The command below executes a “pip install” that will install the cqlsh-expansion scripts. It will also install a requirements file containing a list of dependencies. The --`user` flag tells pip to use the Python *user install directory* for your platform. Typically ~/.local/ on unix based systems. 
 
 ```
-
 pip install --user cqlsh-expansion 
-
 ```
 
 Alternatively, if you are using python3 as default you may have to use the following command to install the cqlsh-expansion package. 
 
 ```
-
-python2 -m pip install --user cqlsh-expansion
-
+python3 -m pip install --user cqlsh-expansion
 ```
-
-
 
 ## Setup cqlsh-expansion to connect to Amazon Keyspaces
 
@@ -45,53 +39,63 @@ Now that you have you cqlsh-expansion installed and have setup up the configurat
 To connect to Amazon Keyspaces you will need to choose one of the [service endpoints](https://docs.aws.amazon.com/keyspaces/latest/devguide/programmatic.endpoints.html). You can also connect to Amazon Keyspaces using [Interface VPC endpoints](https://docs.aws.amazon.com/keyspaces/latest/devguide/vpc-endpoints.html) to enable private communication between your virtual private cloud (VPC) running in Amazon VPC and Amazon Keyspaces. For example, to connect to the Keyspaces service in US East (N. Virginia) (us-east-1) you will want to use the [cassandra.us-east-1.amazonaws.com](http://cassandra.us-east-1.amazonaws.com/) service endpoint.  All communication with Amazon Keyspaces will be over port 9142. 
 
 ### Choose authentication method and connect
-
- To provide users and applications with credentials for programmatic access to Amazon Keyspaces resources, you can do either of the following:
+To provide users and applications with credentials for programmatic access to Amazon Keyspaces resources, you can do either of the following:
 
 #### Connect with IAM access keys (users,roles, and federated identities)
 
-For enhanced security, we recommend to create IAM access keys for IAM users and roles that are used across all AWS services. To use IAM access keys to connect to Amazon Keyspaces, customers can use the Signature Version 4 Process (SigV4) authentication plugin for Cassandra client drivers. To learn more about how the Amazon Keyspaces SigV4 plugin enables [IAM users, roles, and federated identities](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) to authenticate in Amazon Keyspaces API requests, see [AWS Signature Version 4 process (SigV4)](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html). You can use the Sigv4 plugin with the cqlsh-expansion script by providing the following flag. . `--auth-provider "SigV4AuthProvider"` . The Sigv4 plugin depends on the AWS SDK for Python (Boto3) which is included in the requirements file.  You will also need to set the the proper credentials to make service calls. You can use the following tutorial to [setup credentials using the AWS CLI.](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html) 
+For enhanced security, we recommend to create IAM access keys for IAM users and roles that are used across all AWS services. To use IAM access keys to connect to Amazon Keyspaces, customers can use the Signature Version 4 Process (SigV4) authentication plugin for Cassandra client drivers. To learn more about how the Amazon Keyspaces SigV4 plugin enables [IAM users, roles, and federated identities](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) to authenticate in Amazon Keyspaces API requests, see [AWS Signature Version 4 process (SigV4)](https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html). 
 
 After you have the credentials setup with [privileges](https://docs.aws.amazon.com/keyspaces/latest/devguide/security_iam_service-with-iam.html) to access Amazon Keyspaces system tables, you can execute the following command to connect to Amazon Keyspaces with CQLSH using the Sigv4 process.  
 
-```
-
-cqlsh-expansion cassandra.us-east-1.amazonaws.com 9142 --ssl --auth-provider "SigV4AuthProvider"
+Validate the module name and classname, region_name based on keyspaces endpoint in cqlshrc file. 
 
 ```
+[auth_provider]
+;; you can specify any auth provider found in your python environment
+;; module and class will be used to dynamically load the class
+;; all other properties found here and in the credentials file under the class name
+;; will be passed to the constructor
+module = cassandra_sigv4.auth
+classname = SigV4AuthProvider
+region_name = us-east-1
+```
+you can also set region as Environment variable
 
+```
+ export AWS_DEFAULT_REGION = us-east-1
+```
+
+To connect to Amazon Keyspaces with cqlsh-expansion using Sigv4 authenticator.  
+```
+cqlsh-expansion cassandra.us-east-1.amazonaws.com 
+```
 
 #### Connect with service-specific credentials
 
-You can create service-specific credentials that are similar to the traditional username and password that Cassandra uses for authentication and access management. AWS service-specific credentials are associated with a specific AWS Identity and Access Management (IAM) user and can only be used for the service they were created for. For more information, see [Using IAM with Amazon Keyspaces (for Apache Cassandra)](http://using%20iam%20with%20amazon%20keyspaces%20%28for%20apache%20cassandra%29/) in the IAM User Guide. To connect to Amazon Keyspaces using the cqlsh-expansion and IAM service-specific credentials you can use the command below. In this command we are connecting to us-east-1 region with service specific user *‘mike-user-99’ *and service specific user password* ‘user-pass-01’. *You will need to replace these credentials with your own user name and password that were given to you when creating the service specific credentials. 
+You can create service-specific credentials that are similar to the traditional username and password that Cassandra uses for authentication and access management. AWS service-specific credentials are associated with a specific AWS Identity and Access Management (IAM) user and can only be used for the service they were created for. For more information, see [Using IAM with Amazon Keyspaces (for Apache Cassandra)](http://using%20iam%20with%20amazon%20keyspaces%20%28for%20apache%20cassandra%29/) in the IAM User Guide. To connect to Amazon Keyspaces using the cqlsh-expansion and IAM service-specific credentials you can use the command below. In this command we are connecting to us-east-1 region with service specific user *‘Sri-user-99’ *and service specific user password* ‘user-pass-01’. *You will need to replace these credentials with your own user name and password that were given to you when creating the service specific credentials. 
+
 
 ```
-
-cqlsh-expansion cassandra.us-east-1.amazonaws.com 9142 --ssl -u mike-user-99 -p user-pass-01
-
+[auth_provider]
+;; you can specify any auth provider found in your python environment
+;; module and class will be used to dynamically load the class
+;; all other properties found here and in the credentials file under the class name
+;; will be passed to the constructor
+module = cassandra.auth
+classname = PlainTextAuthProvider
 ```
 
-Alternatively, if you want to use the cqlsh without the additional functionality included in the cqlsh-expansion package you can execute the following. 
-
+```
+cqlsh-expansion cassandra.us-east-1.amazonaws.com -u Sri-user-99 -p user-pass-01
 ```
 
-cqlsh cassandra.us-east-1.amazonaws.com 9142 --ssl -u mike-user-99 -p user-pass-01
-
-```
 
 ## Cleanup
 To remove the cqlsh-expansion package you can use the pip uninstall api. Additionally, if you executed the post install script ```cqlsh-expansion.init```, you may want to delete the .cassandra directory which contains the cqlshrc file and the ssl certificate. Using pip uninstall will not remove changes made by the post install script. 
 
 ```
 pip uninstall cqlsh-expansion
-
 ```
-
-## Functional differences from CQLSH
-
-### Sigv4 authentication
-
-Instead of using the service specific credentials for an IAM user, you can use the `--auth-provider "SigV4AuthProvider"` parameter to leverage the Sigv4 authentication plugin for temporary credentials. This plugin enables IAM users, roles, and federated identities to add authentication information to Amazon Keyspaces (for Apache Cassandra) API requests using the AWS Signature Version 4 Process (SigV4). The plugin depends on the AWS SDK for Python (Boto3) and the [Amazon Keyspaces Sigv4 plugin for the DataStax python driver](https://github.com/aws/aws-sigv4-auth-cassandra-python-driver-plugin).
 
 ### New output for TTY
 

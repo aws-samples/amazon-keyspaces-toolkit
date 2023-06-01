@@ -15,12 +15,12 @@
 # limitations under the License.
 
 # to configure behavior, define $CQL_TEST_HOST to the destination address
-# for Thrift connections, and $CQL_TEST_PORT to the associated port.
+# and $CQL_TEST_PORT to the associated port.
 
 from unittest import TestCase
 from operator import itemgetter
 
-from ..cql3handling import CqlRuleSet
+from cqlshlib.cql3handling import CqlRuleSet
 
 
 class TestCqlParsing(TestCase):
@@ -711,14 +711,79 @@ class TestCqlParsing(TestCase):
     def test_parse_select_token(self):
         pass
 
+    def test_strip_comment_blocks_from_input(self):
+
+        parsed = parse_cqlsh_statements('SELECT FROM /* comment block */ "MyTable";')
+        self.assertSequenceEqual(tokens_with_types(parsed),
+                                 [('SELECT', 'reserved_identifier'),
+                                  ('FROM', 'reserved_identifier'),
+                                  ('"MyTable"', 'quotedName'),
+                                  (';', 'endtoken')])
+
+        parsed = parse_cqlsh_statements('SELECT FROM /* \n comment block starts here; \n and continues here \n */ "MyTable";')
+        self.assertSequenceEqual(tokens_with_types(parsed),
+                                 [('SELECT', 'reserved_identifier'),
+                                  ('FROM', 'reserved_identifier'),
+                                  ('"MyTable"', 'quotedName'),
+                                  (';', 'endtoken')])
+
+        parsed = parse_cqlsh_statements('''
+                                        SELECT FROM /*
+                                         comment block starts here;
+                                         and continues here
+                                         */ "MyTable";
+                                        ''')
+        self.assertSequenceEqual(tokens_with_types(parsed),
+                                 [('SELECT', 'reserved_identifier'),
+                                  ('FROM', 'reserved_identifier'),
+                                  ('"MyTable"', 'quotedName'),
+                                  (';', 'endtoken')])
+
+        parsed = parse_cqlsh_statements('''
+                                        /* comment block */
+                                        SELECT FROM "MyTable";
+                                        ''')
+        self.assertSequenceEqual(tokens_with_types(parsed),
+                                 [('SELECT', 'reserved_identifier'),
+                                  ('FROM', 'reserved_identifier'),
+                                  ('"MyTable"', 'quotedName'),
+                                  (';', 'endtoken')])
+
+        parsed = parse_cqlsh_statements('''
+                                        /* comment block */
+                                        /* another comment */ SELECT FROM /*
+                                         comment block starts here;
+                                         and continues here
+                                         */ "MyTable";
+                                        ''')
+        self.assertSequenceEqual(tokens_with_types(parsed),
+                                 [('SELECT', 'reserved_identifier'),
+                                  ('FROM', 'reserved_identifier'),
+                                  ('"MyTable"', 'quotedName'),
+                                  (';', 'endtoken')])
+
+        parsed = parse_cqlsh_statements('''
+                                        SELECT FROM "/*MyTable*/";
+                                        ''')
+        self.assertSequenceEqual(tokens_with_types(parsed),
+                                 [('SELECT', 'reserved_identifier'),
+                                  ('FROM', 'reserved_identifier'),
+                                  ('"/*MyTable*/"', 'quotedName'),
+                                  (';', 'endtoken')])
+
+        parse_cqlsh_statements('''
+                               */ SELECT FROM "MyTable";
+                               ''')
+        self.assertRaises(SyntaxError)
+
 
 def parse_cqlsh_statements(text):
-    '''
+    """
     Runs its argument through the sequence of parsing steps that cqlsh takes its
     input through.
 
     Currently does not handle batch statements.
-    '''
+    """
     # based on onecmd
     statements, _ = CqlRuleSet.cql_split_statements(text)
     # stops here. For regular cql commands, onecmd just splits it and sends it
@@ -734,13 +799,13 @@ def tokens_with_types(lexed):
 
 
 def strip_final_empty_items(xs):
-    '''
+    """
     Returns its a copy of argument as a list, but with any terminating
     subsequence of falsey values removed.
 
     >>> strip_final_empty_items([[3, 4], [5, 6, 7], [], [], [1], []])
     [[3, 4], [5, 6, 7], [], [], [1]]
-    '''
+    """
     rv = list(xs)
 
     while rv and not rv[-1]:

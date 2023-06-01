@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cqlshlib.displaying import MAGENTA
-from datetime import datetime, timedelta
-from formatting import CqlType
+from datetime import datetime
 import time
+
 from cassandra.query import QueryTrace, TraceUnavailable
+from cqlshlib.displaying import MAGENTA
 
 
 def print_trace_session(shell, session, session_id, partial_session=False):
@@ -45,8 +45,8 @@ def print_trace(shell, trace):
         return
     names = ['activity', 'timestamp', 'source', 'source_elapsed', 'client']
 
-    formatted_names = map(shell.myformat_colname, names)
-    formatted_values = [map(shell.myformat_value, row) for row in rows]
+    formatted_names = list(map(shell.myformat_colname, names))
+    formatted_values = [list(map(shell.myformat_value, row)) for row in rows]
 
     shell.writeresult('')
     shell.writeresult('Tracing session: ', color=MAGENTA, newline=False)
@@ -73,8 +73,6 @@ def make_trace_rows(trace):
     if trace.duration:
         finished_at = (datetime_from_utc_to_local(trace.started_at) + trace.duration)
         rows.append(['Request complete', str(finished_at), trace.coordinator, total_micro_seconds(trace.duration), trace.client])
-    else:
-        finished_at = trace.duration = "--"
 
     return rows
 

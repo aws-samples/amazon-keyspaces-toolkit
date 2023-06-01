@@ -23,14 +23,14 @@ backoff=0
 
 trap "echo Exited!; exit;" SIGINT SIGTERM
 
-mysecret=$(aws secretsmanager get-secret-value --secret-id "$1" --query SecretString --output text)
+mysecret=$(aws secretsmanager get-secret-value --secret-id "$1" --region "$4" --query SecretString --output text)
 
 username=$(jq --raw-output '.username' <<< $mysecret)
 password=$(jq --raw-output '.password' <<< $mysecret)
 host=$(jq --raw-output '.host' <<< $mysecret)
 port=$(jq --raw-output '.port' <<< $mysecret)
 
-echo "cqlsh $host $port -u **** -p **** ${@:4}"
+echo "cqlsh-expansion $host $port -u **** -p **** ${@:5}"
 
 while [ $success -ne 0 -a $attempts -le $3 -a $SECONDS -le $2  ]
  do
@@ -43,7 +43,7 @@ while [ $success -ne 0 -a $attempts -le $3 -a $SECONDS -le $2  ]
   echo ""
 
   #take paramters starting at $4
-  cqlsh $host $port -u $username -p $password "${@:4}"
+  cqlsh-expansion $host $port -u $username -p $password "${@:5}"
 
   success=$?
  ((attempts++))

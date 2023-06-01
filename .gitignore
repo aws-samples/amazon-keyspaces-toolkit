@@ -3,4 +3,5 @@
 /cqlsh-expansion/cqlsh_expansion.egg-info
 /cqlsh-expansion/build
 /cqlsh-expansion/dist
+/cqlsh-expansion/pylib/cqlshlib/__pycache__
 .idea

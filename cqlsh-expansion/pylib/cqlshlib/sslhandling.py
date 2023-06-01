@@ -16,8 +16,9 @@
 
 import os
 import sys
-import ConfigParser
 import ssl
+
+import configparser
 
 
 def ssl_settings(host, config_file, env=os.environ):
@@ -38,14 +39,19 @@ def ssl_settings(host, config_file, env=os.environ):
     either in the config file or as an environment variable.
     Environment variables override any options set in cqlsh config file.
     """
-    configs = ConfigParser.SafeConfigParser()
+    configs = configparser.ConfigParser()
     configs.read(config_file)
 
     def get_option(section, option):
         try:
             return configs.get(section, option)
-        except ConfigParser.Error:
+        except configparser.Error:
             return None
+
+    def get_best_tls_protocol(ssl_ver_str):
+        if ssl_ver_str:
+            print("Warning: Explicit SSL and TLS versions in the cqlshrc file or in SSL_VERSION environment property are ignored as the protocol is auto-negotiated.\n")
+        return ssl.PROTOCOL_TLS
 
     ssl_validate = env.get('SSL_VALIDATE')
     if ssl_validate is None:
@@ -55,13 +61,8 @@ def ssl_settings(host, config_file, env=os.environ):
     ssl_version_str = env.get('SSL_VERSION')
     if ssl_version_str is None:
         ssl_version_str = get_option('ssl', 'version')
-    if ssl_version_str is None:
-        ssl_version_str = "TLSv1"
 
-    ssl_version = getattr(ssl, "PROTOCOL_%s" % ssl_version_str, None)
-    if ssl_version is None:
-        sys.exit("%s is not a valid SSL protocol, please use one of SSLv23, "
-                 "TLSv1, TLSv1.1, or TLSv1.2" % (ssl_version_str,))
+    ssl_version = get_best_tls_protocol(ssl_version_str)
 
     ssl_certfile = env.get('SSL_CERTFILE')
     if ssl_certfile is None:
