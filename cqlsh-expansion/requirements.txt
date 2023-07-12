@@ -1,8 +1,4 @@
-futures>=2.1.6
-six>=1.15.0
-urllib3
-python_dateutil
-cassandra-driver>=3.25.0
-botocore
-boto3
+six>1.14.0
+cassandra-driver
+boto3>=1.16
 cassandra-sigv4>=4.0.2

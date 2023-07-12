@@ -81,10 +81,10 @@ classname = PlainTextAuthProvider
 hostname = 127.0.0.1
 
 ;; The port to connect to (9042 is the native protocol default)
-port = 9142
+port = 9042
 
 ;; Always connect using SSL - false by default
-ssl = true
+ssl = false
 
 ;; A timeout in seconds for opening new connections
 ; timeout = 10
@@ -110,7 +110,7 @@ field_size_limit = 999999
 certfile = ~/.cassandra/sf-class2-root.crt
 
 ;; Optional - true by default.
-;validate = true
+;validate = false
 
 ;; To be provided when require_client_auth=true
 ;userkey = ~/key.pem
@@ -158,7 +158,7 @@ numprocesses = 16
 
 ;; The maximum number of failed attempts to fetch a range of data (when using
 ;; COPY TO) or insert a chunk of data (when using COPY FROM) before giving up
-maxattempts = 25
+maxattempts = 1000
 
 ;; How often status updates are refreshed, in seconds
 ; reportfrequency = 0.25
@@ -211,7 +211,7 @@ ingestrate = 1500
 ; skipcols =
 
 ;; The maximum global number of parsing errors to ignore, -1 means unlimited
-maxparseerrors = -1
+maxparseerrors = 1000
 
 ;; The maximum global number of insert errors to ignore, -1 means unlimited
 maxinserterrors = -1

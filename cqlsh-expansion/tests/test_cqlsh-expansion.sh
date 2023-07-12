@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/cqlsh_expansion/bash
 
 #Simple test for functionality of Keyspaces cqlsh-expansion.
 

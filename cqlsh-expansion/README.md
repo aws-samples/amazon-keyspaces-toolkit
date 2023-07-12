@@ -62,12 +62,12 @@ region_name = us-east-1
 you can also set region as Environment variable
 
 ```
- export AWS_DEFAULT_REGION = us-east-1
+ export AWS_DEFAULT_REGION=us-east-1 
 ```
 
 To connect to Amazon Keyspaces with cqlsh-expansion using Sigv4 authenticator.  
 ```
-cqlsh-expansion cassandra.us-east-1.amazonaws.com 
+cqlsh-expansion cassandra.us-east-1.amazonaws.com 9142 --ssl 
 ```
 
 #### Connect with service-specific credentials
