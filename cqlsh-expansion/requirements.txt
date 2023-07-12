@@ -1,4 +1,4 @@
-six>1.14.0
+six>=1.12.0
 cassandra-driver
-boto3>=1.16
+boto3
 cassandra-sigv4>=4.0.2

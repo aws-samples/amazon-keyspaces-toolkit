@@ -14,10 +14,8 @@ RUN mkdir $AWS_KEYSPACES_WORKING_DIR/bin
 #Install jq
 RUN yum install -y jq && yum install python3-pip -y && yum clean all
 
-RUN pip3 install importlib-metadata
-RUN pip3 install boto3
-RUN pip3 install six
-RUN pip3 install -i https://test.pypi.org/simple/ cqlsh-expansion-mjpr==0.9.16
+
+RUN pip3 install cqlsh-expansion==0.9.5
 
 RUN cqlsh-expansion.init
 

@@ -43,9 +43,17 @@ def initialize_cassandra_directory():
         else:
             print('Directory already exists ' + config_dir)
 
+        local_repos = site.getusersitepackages()
+        if isinstance(local_repos, str):
+            local_repos = [site.getusersitepackages()]
+
+        global_repos = site.getsitepackages()
+        if isinstance(global_repos, str):
+            global_repos = [site.getusersitepackages()]
+
         cert_found = False
 
-        for one_path in site.getusersitepackages():
+        for one_path in local_repos:
             cert_install_file = os.path.join(one_path, 'cqlsh_expansion', 'sf-class2-root.crt')
             if os.path.exists(cert_install_file):
                 print('Copying cert from ' + cert_install_file + ' to ' + cert_dest_file)
@@ -54,7 +62,7 @@ def initialize_cassandra_directory():
                 break
 
         if not cert_found:
-            for one_path in site.getsitepackages():
+            for one_path in global_repos:
                 cert_install_file = os.path.join(one_path, 'cqlsh_expansion', 'sf-class2-root.crt')
                 if os.path.exists(cert_install_file):
                     print('Copying cert from ' + cert_install_file + ' to ' + cert_dest_file)
@@ -66,7 +74,7 @@ def initialize_cassandra_directory():
             print('sf-class2-root.crt not found ')
 
         cqlshrc_found = False
-        for one_path in site.getusersitepackages():
+        for one_path in local_repos:
             cqlshrc_install_file = os.path.join(one_path, 'cqlsh_expansion', 'cqlshrc_template')
             if os.path.exists(cqlshrc_install_file):
                 print('Copying cqlshrc from ' + cqlshrc_install_file + ' to ' + cqlshrc_dest_file)
@@ -75,7 +83,7 @@ def initialize_cassandra_directory():
                 break
 
         if not cqlshrc_found:
-            for one_path in site.getsitepackages():
+            for one_path in global_repos:
                 cqlshrc_install_file = os.path.join(one_path, 'cqlsh_expansion', 'cqlshrc_template')
                 if os.path.exists(cqlshrc_install_file):
                     print('Copying cqlshrc from '+ cqlshrc_install_file + ' to ' + cqlshrc_dest_file)

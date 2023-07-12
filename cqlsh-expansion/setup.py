@@ -8,17 +8,17 @@ long_description = (pathlib.Path(__file__).parent.resolve() / 'README.md').read_
 
 # Setting up
 setup(
-    name="cqlsh-expansion-mjpr",
-    version='0.9.16',
+    name="cqlsh-expansion",
+    version='0.9.5',
     description='The cqlsh-expansion utility extends native cqlsh functionality to include cloud native capabilities',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url = 'https://github.com/aws-samples/amazon-keyspaces-toolkit/tree/master/cqlsh-expansion',
     python_requires='>=3.6',
     install_requires=[
-        "six>1.14.0",
+        "six>=1.12.0",
         "cassandra-driver",
-        "boto3>=1.16",
+        "boto3",
         "cassandra-sigv4>=4.0.2",
     ],
     classifiers=[
