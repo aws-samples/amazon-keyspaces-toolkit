@@ -5,11 +5,10 @@ from setuptools import setup, find_packages
 # Get the long description from the README file
 long_description = (pathlib.Path(__file__).parent.resolve() / 'README.md').read_text(encoding='utf-8')
 
-
 # Setting up
 setup(
     name="cqlsh-expansion",
-    version='0.9.5',
+    version='0.9.6',
     description='The cqlsh-expansion utility extends native cqlsh functionality to include cloud native capabilities',
     long_description=long_description,
     long_description_content_type='text/markdown',

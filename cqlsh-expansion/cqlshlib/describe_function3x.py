@@ -43,14 +43,19 @@ def do_describe_3x(cqlshell, cqlruleset, parsed, out, cmd):
         def get_keyspace_names_3x_mod():
             return list(cqlshell.conn.metadata.keyspaces.keys())
 
+
         def get_columnfamily_names_3x(ksname=None):
             if ksname is None:
                 ksname = cqlshell.current_keyspace
+
+            return list(get_keyspace_meta_3x(ksname).tables.keys())
 
         def get_keyspace_meta_3x( ksname):
             if ksname not in cqlshell.conn.metadata.keyspaces:
                 raise KeyspaceNotFound('Keyspace %r not found.' % ksname)
             return cqlshell.conn.metadata.keyspaces[ksname]
+
+
 
         def get_partitioner_3x():
             return cqlshell.conn.metadata.partitioner
