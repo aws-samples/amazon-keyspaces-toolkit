@@ -50,56 +50,11 @@ parser.add_option("--port", help='Port to connect to cassandra', type=int)
 parser.add_option("--file", help='Schema file to run compatability script against')
 
 
-# The function checks if the system_schema is part of the schema exported and tracks the frozen type in system_schema
-
-def frozen_counter(cluster_schema):
- frozen_in_system_schema = 0
- system_schema_keyspace_tables = ['system_schema.tables', 'system_schema.functions', 'system_schema.triggers', 'system_schema.aggregates', 'system_schema.views', 'system_schema.indexes', 'system_schema.keyspaces', 'system_schema.types','system.paxos_repair_history','system.top_partitions','system_auth.network_permissions','system_views.clients','system_views.repair_jobs','system_views.repair_participates','system_views.repair_sessions','system_views.repair_validations','system_views.repairs','system_views.streaming']
- for item in system_schema_keyspace_tables:
-   occurances = re.findall( item, cluster_schema, re.IGNORECASE)
-   if len(occurances) > 0:
-      if item == 'system_schema.tables':
-         frozen_in_system_schema = frozen_in_system_schema + 5
-      elif item == 'system_schema.functions':
-         frozen_in_system_schema = frozen_in_system_schema + 2
-      elif item == 'system_schema.triggers':
-         frozen_in_system_schema = frozen_in_system_schema + 1    
-      elif item == 'system_schema.aggregates':
-         frozen_in_system_schema = frozen_in_system_schema + 1
-      elif item == 'system_schema.views':
-         frozen_in_system_schema = frozen_in_system_schema + 4
-      elif item == 'system_schema.indexes':
-         frozen_in_system_schema = frozen_in_system_schema + 1
-      elif item == 'system_schema.keyspaces':
-         frozen_in_system_schema = frozen_in_system_schema + 1
-      elif item == 'system_schema.types':
-         frozen_in_system_schema = frozen_in_system_schema + 2
-      elif item == 'system.paxos_repair_history':
-         frozen_in_system_schema = frozen_in_system_schema + 2
-      elif item == 'system.top_partitions':
-         frozen_in_system_schema = frozen_in_system_schema + 2
-      elif item == 'system_auth.network_permissions':
-         frozen_in_system_schema = frozen_in_system_schema + 1
-      elif item == 'system_views.clients':
-         frozen_in_system_schema = frozen_in_system_schema + 1
-      elif item == 'system_views.repair_jobs':
-         frozen_in_system_schema = frozen_in_system_schema + 2
-      elif item == 'system_views.repair_participates':
-         frozen_in_system_schema = frozen_in_system_schema + 3
-      elif item == 'system_views.repair_sessions':
-         frozen_in_system_schema = frozen_in_system_schema + 4
-      elif item == 'system_views.repair_validations':
-         frozen_in_system_schema = frozen_in_system_schema + 1
-      elif item == 'system_views.repairs':
-         frozen_in_system_schema = frozen_in_system_schema + 11
-      elif item == 'system_views.streaming':
-         frozen_in_system_schema = frozen_in_system_schema + 1
- return frozen_in_system_schema
 
 # The function checks the schema and provides the compatability 
 def schema_check(cluster_schema):
 
- api_features = ['CREATE INDEX', 'CREATE TYPE', 'CREATE TRIGGER', 'CREATE FUNCTION', 'CREATE AGGREGATE', 'CREATE MATERIALIZED VIEW', 'frozen<', 'cdc = true']
+ api_features = ['CREATE INDEX', 'CREATE TYPE', 'CREATE TRIGGER', 'CREATE FUNCTION', 'CREATE AGGREGATE', 'CREATE MATERIALIZED VIEW', 'cdc = true']
  unsupported_features_List = {}
  unsupported_features_message = {}
 
@@ -109,7 +64,6 @@ def schema_check(cluster_schema):
  unsupported_features_message['CREATE FUNCTION'] = 'User Defined function'
  unsupported_features_message['CREATE AGGREGATE'] = 'Aggregators'
  unsupported_features_message['CREATE MATERIALIZED VIEW'] = 'Materialized View'
- unsupported_features_message['frozen<'] = 'Frozen Data type'
  unsupported_features_message['cdc = true'] = 'Change Data Capture'
 
  for item in api_features:
@@ -122,16 +76,10 @@ def schema_check(cluster_schema):
  
  elif len(unsupported_features_List) > 0:
     print("")
-    print('The following {} unsupported features were found. Some of these features have workarounds. Please contact Amazon Keyspaces team - mbh@amazon.com, kanvesky@amazon.com and nkantam@amazon.com to know about Workaround information'.format(len(unsupported_features_List)))
+    print('The following {} unsupported features were found. Some of these features have workarounds. Please contact AWS Account team or Amazon Keyspaces team through AWS support to know about Workaround information'.format(len(unsupported_features_List)))
     for item in unsupported_features_List.keys():
        print("")
-       if item == 'frozen<':
-        frozen_system = frozen_counter(cluster_schema)
-        frozen_non_system_keyspaces = unsupported_features_List[item] - frozen_system
-        if frozen_non_system_keyspaces > 0:
-         print("  {} | found {} time(s)".format(unsupported_features_message[item], frozen_non_system_keyspaces))
-       else:
-        print("  {} | found {} time(s)".format(unsupported_features_message[item], unsupported_features_List[item]))
+       print("  {} | found {} time(s)".format(unsupported_features_message[item], unsupported_features_List[item]))
  
 optvalues = optparse.Values()
 (options, arguments) = parser.parse_args(sys.argv[1:], values=optvalues)
