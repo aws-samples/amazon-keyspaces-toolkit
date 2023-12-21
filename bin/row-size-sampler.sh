@@ -35,11 +35,31 @@ SYSTEMKEYSPACEFILTER='system\|system_schema\|system_traces\|system_auth\|dse_aut
 
 TABLEFILTER='^-\|^table_name\|(\|)'
 
-keyspaces=$(echo desc keyspaces | kqlsh $@  | xargs -n1 echo | grep -v $SYSTEMKEYSPACEFILTER)
+#look at all keyspaces
+keyspaces=$(echo desc keyspaces | kqlsh "$@"  | xargs -n1 echo | grep -v $SYSTEMKEYSPACEFILTER)
 for ks in $keyspaces; do
-  tables=$(echo "SELECT table_name FROM system_schema.tables WHERE keyspace_name='$ks';" | kqlsh $@ | xargs -n1 echo | grep -v $TABLEFILTER)
+
+  #look at all tables in keyspace
+  tables=$(echo "SELECT table_name FROM system_schema.tables WHERE keyspace_name='$ks';" | kqlsh "$@" | xargs -n1 echo | grep -v $TABLEFILTER)
   for tb in $tables; do
-    kqlsh $@ -e  "CONSISTENCY LOCAL_ONE; PAGING 100; SELECT * FROM \"$ks\".\"$tb\" LIMIT 30000;" | grep -v '\[json\]\|rows)\|-----\|^$' | tr -d ' ' | awk -v keyspace=$ks -v table=$tb -F'|' 'BEGIN {columns=0; numSamples=30000; kilobyte=1024; min = "NaN"; max = -1; lines = 1; }  { if(NR==2){columns=NF;} if(NR>2){thislen=length($0)+107; total+=thislen; squares+=thislen^2;  lines+=1; avg=total/lines;  min = (thislen<min ? thislen : min); max =  (thislen>max ? thislen : max) }} NR==numSamples {exit} END { printf("%s.%s = { lines: %d, columns: %d, average: %d bytes, stdev: %d bytes, min: %d bytes, max: %d bytes}\n", keyspace, table, lines, columns, avg, sqrt(squares/lines - (avg^2)), min, max); }'
-    kqlsh $@ -e  "DESCRIBE \"$ks\".\"$tb\";" | grep -i blob | while read line; do printf "\t...\"$ks\".\"$tb\" contains a BLOB type, if the majority of row size is from the BLOB, then divide the estimate in half" ; done
+    #if a table has a blob, its assumed that size of blob is large factor in row size. 
+    #if blob is detected the output totals should be divided by two for that table. 
+    #Divided by two since output is printed in Hex(2 bytes) for each byte. 
+    blob_factor="n"
+    ttl_factor="y"
+    static_factor="n"
+
+    describe=$(echo desc table $ks.$tb | kqlsh "$@")
+
+    while read line; do ttl_factor="n" ; done < <(echo desc table $ks.$tb | kqlsh "$@" | xargs echo | grep -i "default_time_to_live = 0") 
+
+    while read line; do blob_factor="y" ; done < <(echo desc table $ks.$tb | kqlsh "$@"  | xargs -n1 echo | grep -i blob)
+
+    while read line; do static_factor="y" ; done < <(echo desc table $ks.$tb | kqlsh "$@"  | xargs -n1 echo | grep -i static) 
+
+    #Calculate averages using awk
+    kqlsh "$@" -e  "CONSISTENCY LOCAL_ONE; PAGING 100; SELECT * FROM \"$ks\".\"$tb\" LIMIT 30000;" | grep -v '\[json\]\|rows)\|-----\|^$' | tr -d ' ' | awk -v keyspace=$ks -v table=$tb -v blob_factor=$blob_factor -v ttl_factor=$ttl_factor -v frozen_factor=$frozen_factor -v static_factor=$static_factor -F'|' 'BEGIN {columns=0; numSamples=30000; kilobyte=1024; min = "NaN"; max = -1; lines = 1; }  {  if(NR==3){columns=NF;} if(NR>2){thislen=(length($0))+100+6+(columns*2); total+=thislen; squares+=thislen^2;  lines+=1; avg=total/lines;  min = (thislen<min ? thislen : min); max =  (thislen>max ? thislen : max) }} NR==numSamples {exit} END { printf("%s.%s = { lines: %d, columns: %d, average: %d bytes, stdev: %d bytes, min: %d bytes, max: %d bytes, blob: %s, default-ttl: %s, static: %s}\n", keyspace, table, lines, columns, avg, sqrt(squares/lines - (avg^2)), min, max, blob_factor, ttl_factor, static_factor); }'
   done
 done
+
+echo 'fin!'
