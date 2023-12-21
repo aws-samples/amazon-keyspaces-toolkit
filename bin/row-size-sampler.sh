@@ -49,12 +49,13 @@ for ks in $keyspaces; do
     ttl_factor="y"
     static_factor="n"
 
-    describe=$(echo desc table $ks.$tb | kqlsh "$@")
-
+    #using defualt ttl
     while read line; do ttl_factor="n" ; done < <(echo desc table $ks.$tb | kqlsh "$@" | xargs echo | grep -i "default_time_to_live = 0") 
 
+    #using blobs
     while read line; do blob_factor="y" ; done < <(echo desc table $ks.$tb | kqlsh "$@"  | xargs -n1 echo | grep -i blob)
 
+    #using statics
     while read line; do static_factor="y" ; done < <(echo desc table $ks.$tb | kqlsh "$@"  | xargs -n1 echo | grep -i static) 
 
     #Calculate averages using awk
