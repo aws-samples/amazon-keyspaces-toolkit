@@ -11,8 +11,8 @@ ssl_context.load_verify_locations('/home/ec2-user/sf-class2-root.crt')
 ssl_context.verify_mode = CERT_REQUIRED
 exec_profile = ExecutionProfile(consistency_level=ConsistencyLevel.LOCAL_QUORUM, 
                                 load_balancing_policy=DCAwareRoundRobinPolicy())
-auth_provider = PlainTextAuthProvider(username='test-user+1-at-019910015823', 
-                                      password='HmH6NZxEvOk8OFkge342GTB0ycZxCBc7/tScGdtvDTQ=')
+auth_provider = PlainTextAuthProvider(username='YOUR USERNAME', 
+                                      password='YOUR PASSWORD')
 cluster = Cluster(['cassandra.us-east-1.amazonaws.com'], 
                   ssl_context=ssl_context, 
                   auth_provider=auth_provider, 
@@ -23,7 +23,7 @@ session = cluster.connect()
 
 #Amazon Elasticache connection
 logging.basicConfig(level=logging.ERROR)
-redis = RedisCluster(startup_nodes=[{"host": "keyspaces-cache.ebnqkc.clustercfg.use1.cache.amazonaws.com", 
+redis = RedisCluster(startup_nodes=[{"host": "keyspaces-cache.exxxxc.clustercfg.use1.cache.amazonaws.com", 
                                      "port": "6379"}], 
                      decode_responses=True,
                      skip_full_coverage_check=True)
