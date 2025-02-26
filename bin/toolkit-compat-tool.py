@@ -54,12 +54,11 @@ parser.add_option("--file", help='Schema file to run compatability script agains
 # The function checks the schema and provides the compatability 
 def schema_check(cluster_schema):
 
- api_features = ['CREATE INDEX', 'CREATE TYPE', 'CREATE TRIGGER', 'CREATE FUNCTION', 'CREATE AGGREGATE', 'CREATE MATERIALIZED VIEW', 'cdc = true']
+ api_features = ['CREATE INDEX', 'CREATE TRIGGER', 'CREATE FUNCTION', 'CREATE AGGREGATE', 'CREATE MATERIALIZED VIEW', 'cdc = true']
  unsupported_features_List = {}
  unsupported_features_message = {}
 
  unsupported_features_message['CREATE INDEX'] = 'Secondary Index'
- unsupported_features_message['CREATE TYPE'] = 'User Defined Type'
  unsupported_features_message['CREATE TRIGGER'] = 'Trigger'
  unsupported_features_message['CREATE FUNCTION'] = 'User Defined function'
  unsupported_features_message['CREATE AGGREGATE'] = 'Aggregators'
